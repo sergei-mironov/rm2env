@@ -1,13 +1,15 @@
 
-ReHackable
-----------
+ReMarkable2 links
+-----------------
 
+### General
+
+* RemarkableWiki https://remarkablewiki.com/tips/start
 * reHackable https://github.com/reHackable/awesome-reMarkable
-* Wiki https://remarkablewiki.com/tips/start
 * Reddit
   - https://www.reddit.com/r/RemarkableTablet/comments/ickcu5/we_need_split_screen_for_the_rm2/
 
-Briefly:
+### Topics
 
 * SSH access and backups https://remarkablewiki.com/tech/ssh#ssh_access
 * Entware https://github.com/evidlo/remarkable_entware
