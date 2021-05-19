@@ -34,3 +34,9 @@ ReMarkable2 links
     + Requires `rmcl` and `rmrl`
   - Syncthing https://github.com/evidlo/remarkable_syncthing
     + Requires Entware
+
+
+Issues
+------
+
+* https://github.com/rschroll/rmcl/issues/1
