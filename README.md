@@ -40,3 +40,22 @@ Issues
 ------
 
 * https://github.com/rschroll/rmcl/issues/1
+
+
+Shell hints
+-----------
+
+### Nix-shell
+
+```
+$ nix-shell -A shell
+```
+
+### RMfuse
+
+```
+$ mkdir _remarkable
+$ rmfuse -v _remarkable
+```
+
+
