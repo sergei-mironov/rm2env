@@ -148,6 +148,10 @@ let
 
         propagatedBuildInputs = with python ; [ trio xdg asks ];
 
+        patches = [
+          ./0001-Change-Device-and-User-token-urls.patch
+        ];
+
         # nativeBuildInputs = [ pkgs.libxdg ];
         src = python.fetchPypi {
           inherit pname version;
@@ -235,6 +239,7 @@ let
           mypython
           remarkable_mouse
           rmfuse
+          pkgs.github-cli
         ];
       shellHook = with pkgs; ''
         export PYTHONPATH=`pwd`/python:$PYTHONPATH

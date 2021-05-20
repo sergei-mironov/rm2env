@@ -1,0 +1,30 @@
+From 8547a7509fe95117e5f5739ded79541c9abf5b49 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jochen=20Schr=C3=B6der?=
+ <1154946+cycomanic@users.noreply.github.com>
+Date: Wed, 19 May 2021 17:06:16 +0200
+Subject: [PATCH] Change Device and User token urls
+
+The device and user token urls used by remarkable changed. See https://github.com/juruen/rmapi/pull/178
+I've also confirmed that these are the urls now used by the remarkable desktop app.
+---
+ rmcl/const.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/rmcl/const.py b/rmcl/const.py
+index 673adee..14e96b8 100644
+--- a/rmcl/const.py
++++ b/rmcl/const.py
+@@ -3,8 +3,8 @@ import enum
+ 
+ RFC3339Nano = "%Y-%m-%dT%H:%M:%SZ"
+ USER_AGENT = "rmcl <https://github.com/rschroll/rmcl>"
+-DEVICE_TOKEN_URL = "https://my.remarkable.com/token/json/2/device/new"
+-USER_TOKEN_URL = "https://my.remarkable.com/token/json/2/user/new"
++DEVICE_TOKEN_URL = "https://webapp-production-dot-remarkable-production.appspot.com/token/json/2/device/new"
++USER_TOKEN_URL = "https://webapp-production-dot-remarkable-production.appspot.com/token/json/2/user/new"
+ USER_TOKEN_VALIDITY = 24 * 60 * 60  # Guessing one day
+ DEVICE_REGISTER_URL = "https://my.remarkable.com/connect/desktop"
+ DEVICE = "desktop-windows"
+-- 
+2.25.4
+
