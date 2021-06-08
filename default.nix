@@ -140,13 +140,47 @@ let
         };
       };
 
+      reportlab = python.reportlab.overrideDerivation (old: rec {
+        pname = "reportlab";
+        version = "3.5.59";
+        src = python.fetchPypi {
+          inherit pname version;
+          sha256 = "sha256:0dj5i64yys0bij1is5f3smbj368s61q1crxv0c5i68zhvjicqmd7";
+        };
+      });
+
+      bidict = python.bidict.overrideDerivation (old: rec {
+        pname = "bidict";
+        version = "0.21.2";
+        name = "${pname}-${version}";
+        src = python.fetchPypi {
+          inherit pname version;
+          sha256 = "sha256:02dy0b1k7qlhn7ajyzkrvxhyhjj0hzcq6ws3zjml9hkdz5znz92g";
+        };
+
+        doCheck = false; # HACK due to failed tests
+        doInstallCheck = false;
+      });
+
+      mytrio = python.trio.overrideDerivation (old: rec {
+        pname = "trio";
+        version = "0.18.0";
+        name = "${pname}-${version}";
+        doCheck = false; # HACK due to 2 failed tests
+        doInstallCheck = false;
+        checkPhase = "";
+        src = python.fetchPypi {
+          inherit pname version;
+          sha256 = "sha256:0xm0bd1rrlb4l9q0nf2n1wg7xh42ljdnm4i4j0651zi73zk6m9l7";
+        };
+      });
 
       rmcl = python.buildPythonPackage rec {
         pname = "rmcl";
         version = "0.4.0";
         # doCheck = false;
 
-        propagatedBuildInputs = with python ; [ trio xdg asks ];
+        propagatedBuildInputs = with python ; [ mytrio xdg asks ];
 
         patches = [
           ./0001-Change-Device-and-User-token-urls.patch

@@ -54,6 +54,7 @@ $ nix-shell -A shell
 ### RMfuse
 
 ```
+$ nix-build -A rmfuse
 $ mkdir _remarkable
 $ rmfuse -v _remarkable
 ```
