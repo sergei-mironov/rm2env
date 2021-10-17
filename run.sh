@@ -1,1 +1,1 @@
-remouse --password boHVAwowAa --orientation=left
+remouse --password `cat _pass.txt` --orientation=left
