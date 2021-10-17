@@ -2,7 +2,7 @@
 , stdenv ? pkgs.stdenv
 }:
 let
-  python = pkgs.python37Packages;
+  python = pkgs.python38Packages;
   local = rec {
     callPackage = pkgs.lib.callPackageWith collection;
     collection = rec {
@@ -265,7 +265,7 @@ let
         screeninfo
       ];
 
-      mypython = pkgs.python37.withPackages mypyps;
+      mypython = pkgs.python38.withPackages mypyps;
 
       shell = pkgs.mkShell {
         name = "shell";

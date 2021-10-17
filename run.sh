@@ -1,1 +1,1 @@
-remouse --password boHVAwowAa
+remouse --password boHVAwowAa --orientation=left
