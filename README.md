@@ -39,7 +39,14 @@ ReMarkable2 links
 Issues
 ------
 
+### Rmcl
+
 * https://github.com/rschroll/rmcl/issues/1
+
+### Remouse
+
+* https://github.com/Evidlo/remarkable_mouse/issues/63
+  + Specifying --password seems to have no effect
 
 
 Shell hints
