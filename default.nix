@@ -87,7 +87,7 @@ let
         doCheck = false;
 
         propagatedBuildInputs = with python ; [ screeninfo libevdev pynput
-        sphinx paramiko ];
+        sphinx paramiko tkinter ];
 
         nativeBuildInputs = [ pkgs.libevdev ];
 
