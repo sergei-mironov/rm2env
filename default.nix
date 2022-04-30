@@ -157,6 +157,7 @@ let
           inherit pname version;
           sha256 = "sha256:02dy0b1k7qlhn7ajyzkrvxhyhjj0hzcq6ws3zjml9hkdz5znz92g";
         };
+        propagatedBuildInputs = with python ; [ setuptools_scm ];
 
         doCheck = false; # HACK due to failed tests
         doInstallCheck = false;
@@ -177,19 +178,18 @@ let
 
       rmcl = python.buildPythonPackage rec {
         pname = "rmcl";
-        version = "0.4.0";
-        # doCheck = false;
+        version = "0.4.2";
 
         propagatedBuildInputs = with python ; [ mytrio xdg asks ];
 
-        patches = [
-          ./0001-Change-Device-and-User-token-urls.patch
-        ];
+        # patches = [
+        #   ./0001-Change-Device-and-User-token-urls.patch
+        # ];
 
         # nativeBuildInputs = [ pkgs.libxdg ];
         src = python.fetchPypi {
           inherit pname version;
-          sha256 = "sha256:0yjj0xmz1qys804mam54a2i6hv6y684x2qxcq71nj4n7yagikg8l";
+          sha256 = "sha256:0ryccqgrcdmali5yn6qrzgyjl9am847sikwgyb5pmjz3wxc4gpjq";
         };
 
       };
@@ -242,8 +242,9 @@ let
 
       rmfuse = python.buildPythonPackage rec {
         pname = "rmfuse";
-        version = "0.2.1";
-        # doCheck = false;
+        # version = "0.2.1";
+        version = "0.2.3";
+        doCheck = false;
 
         propagatedBuildInputs = with python ; [ llfuse rmrl rmcl bidict ];
 
@@ -252,7 +253,7 @@ let
         # src = ./3rdparty/rmfuse;
         src = python.fetchPypi {
           inherit pname version;
-          sha256 = "sha256:0gfjsxdwpd4igycns149xy8ilawpykcrab2x2lg9lrrn668agchh";
+          sha256 = "sha256:1lkyj1a7yb8dgk1q5kfl30jvxihdh0c0785hh6czq85av3r1xxwl";
         };
       };
 
