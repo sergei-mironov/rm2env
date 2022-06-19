@@ -1,10 +1,10 @@
-
 ReMarkable2 links
 -----------------
 
 ### General
 
 * RemarkableWiki https://remarkablewiki.com/tips/start
+  - SSH key issues https://remarkablewiki.com/tech/ssh on modern hardware
 * reHackable https://github.com/reHackable/awesome-reMarkable
 * Reddit
   - https://www.reddit.com/r/RemarkableTablet/comments/ickcu5/we_need_split_screen_for_the_rm2/
@@ -34,6 +34,8 @@ ReMarkable2 links
     + Requires `rmcl` and `rmrl`
   - Syncthing https://github.com/evidlo/remarkable_syncthing
     + Requires Entware
+  - https://github.com/codetist/remarkable2-cloudsync
+    + A script which uses `Rclone` binary.
 
 
 Issues
