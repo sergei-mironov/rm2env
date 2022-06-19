@@ -1,3 +1,34 @@
+About
+-----
+
+This repo contains a [Nix](http://www.nixos.org) environment for Remarkable 2
+tablet device.
+
+Usage
+-----
+
+### Nix-shell
+
+```sh
+$ nix-shell -A shell
+```
+
+### Remarkable mouse
+
+```sh
+$ echo 'password' >_pass.txt
+$ ./runmouse.sh
+```
+
+### RMfuse
+
+```sh
+$ nix-build -A rmfuse
+$ mkdir _remarkable
+$ ./result/bin/rmfuse -v _remarkable
+```
+
+
 ReMarkable2 links
 -----------------
 
@@ -47,25 +78,6 @@ Issues
 
 ### Remouse
 
-* https://github.com/Evidlo/remarkable_mouse/issues/63
+* ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
   + Specifying --password seems to have no effect
-
-
-Shell hints
------------
-
-### Nix-shell
-
-```
-$ nix-shell -A shell
-```
-
-### RMfuse
-
-```
-$ nix-build -A rmfuse
-$ mkdir _remarkable
-$ ./result/bin/rmfuse -v _remarkable
-```
-
 
