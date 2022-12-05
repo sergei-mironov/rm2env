@@ -1,3 +1,6 @@
 [submodule "3rdparty/remarkable_mouse"]
 	path = 3rdparty/remarkable_mouse
 	url = https://github.com/evidlo/remarkable_mouse
+[submodule "3rdparty/remarkable-cli-tooling"]
+	path = 3rdparty/remarkable-cli-tooling
+	url = https://github.com/cherti/remarkable-cli-tooling
