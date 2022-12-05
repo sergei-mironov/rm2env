@@ -2,7 +2,7 @@
 , stdenv ? pkgs.stdenv
 }:
 let
-  python = pkgs.python38Packages;
+  python = pkgs.python3Packages;
   local = rec {
     callPackage = pkgs.lib.callPackageWith collection;
     collection = rec {
@@ -15,7 +15,7 @@ let
         version = "0.6.6";
         doCheck = false; # Minotaur doesn't have tests
 
-        propagatedBuildInputs = [ pkgs.xlibs.xrandr ];
+        propagatedBuildInputs = [ pkgs.xorg.xrandr ];
 
         src = python.fetchPypi {
           inherit pname version;
@@ -147,6 +147,7 @@ let
           inherit pname version;
           sha256 = "sha256:0dj5i64yys0bij1is5f3smbj368s61q1crxv0c5i68zhvjicqmd7";
         };
+        patches = [];
       });
 
       bidict = python.bidict.overrideDerivation (old: rec {
@@ -163,6 +164,7 @@ let
         doInstallCheck = false;
       });
 
+      # mytrio = python.trio;
       mytrio = python.trio.overrideDerivation (old: rec {
         pname = "trio";
         version = "0.18.0";
@@ -266,14 +268,14 @@ let
         screeninfo
       ];
 
-      mypython = pkgs.python38.withPackages mypyps;
+      mypython = pkgs.python3.withPackages mypyps;
 
       shell = pkgs.mkShell {
         name = "shell";
         buildInputs = [
           mypython
           remarkable_mouse
-          rmfuse
+          # rmfuse # Doesn't work due to both API changes and dep problems
           pkgs.github-cli
         ];
       shellHook = with pkgs; ''
