@@ -162,6 +162,7 @@ let
 
         doCheck = false; # HACK due to failed tests
         doInstallCheck = false;
+        propagatedBuildInputs = with python; [ setuptools_scm ];
       });
 
       # mytrio = python.trio;
@@ -260,6 +261,22 @@ let
       };
 
 
+      rm_tools = python.buildPythonPackage rec {
+        pname = "rm_tools";
+        version = "1.0";
+        doCheck = false;
+        propagatedBuildInputs = with python ; [ pypdf2 ];
+        src = ./3rdparty/maxio;
+      };
+
+      # rMsync = python.buildPythonApplication rec {
+      #   pname = "rMsync";
+      #   version = "1.0";
+      #   pythonPath = with python ; [ rm_tools pikepdf ];
+      #   src = ./3rdparty/rMsync;
+      #   doCheck = false;
+      # };
+
       # rmfuse = pkgs.poetry2nix.mkPoetryEnv {
       #     projectDir = ./3rdparty/rmfuse;
       # };
@@ -277,8 +294,11 @@ let
           remarkable_mouse
           # rmfuse # Doesn't work due to both API changes and dep problems
           pkgs.github-cli
+          rm_tools
+          python.pikepdf
         ];
       shellHook = with pkgs; ''
+        export PATH=`pwd`/3rdparty/remarkable-cli-tooling:`pwd`/3rdparty/rMsync:$PATH
         export PYTHONPATH=`pwd`/python:$PYTHONPATH
         export LD_LIBRARY_PATH=${pkgs.libevdev}/lib/:${pkgs.xorg.libX11}/lib:${pkgs.xorg.libXrandr}/lib
       '';
