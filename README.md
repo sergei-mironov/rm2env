@@ -42,6 +42,8 @@ ReMarkable2 links
 * reHackable https://github.com/reHackable/awesome-reMarkable
 * Reddit
   - https://www.reddit.com/r/RemarkableTablet/comments/ickcu5/we_need_split_screen_for_the_rm2/
+* reMarkable directory structure
+  - https://remarkablewiki.com/tech/filesystem
 
 ### Topics
 
@@ -58,7 +60,16 @@ ReMarkable2 links
   - Remarkable CLI tooling https://github.com/cherti/remarkable-cli-tooling
     + Could be up-to-date; More or less works
     + Can't remove file from remarkable
+    + Sent Pull request and filed an issue
+      * https://github.com/cherti/remarkable-cli-tooling/issues/5
+  - Prof. Fraga's page on remarkable with lots of useful scripts
+    https://www.ucl.ac.uk/~ucecesf/remarkable/
+    + [rm2pdf.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/pdf2rm.sh)
+    + [rmlist.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmlist.sh)
+    + [rmconvert.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmconvert.sh)
+    + Author e-mail `e.fraga@ucl.ac.uk`
   - https://github.com/simonschllng/rm-sync
+    + Written in pure Shell curl calls are commented-out
     + Seems to be a local script, incomplete
   - https://github.com/lschwetlick/rMsync
     + Another script, this time in Python
