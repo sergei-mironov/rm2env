@@ -158,7 +158,6 @@ let
           inherit pname version;
           sha256 = "sha256:02dy0b1k7qlhn7ajyzkrvxhyhjj0hzcq6ws3zjml9hkdz5znz92g";
         };
-        propagatedBuildInputs = with python ; [ setuptools_scm ];
 
         doCheck = false; # HACK due to failed tests
         doInstallCheck = false;
@@ -266,6 +265,8 @@ let
         version = "1.0";
         doCheck = false;
         propagatedBuildInputs = with python ; [ pypdf2 ];
+
+        # See https://github.com/reHackable/maxio/tree/master/tools
         src = ./3rdparty/maxio;
       };
 
@@ -294,7 +295,7 @@ let
           remarkable_mouse
           # rmfuse # Doesn't work due to both API changes and dep problems
           pkgs.github-cli
-          rm_tools
+          # rm_tools
           python.pikepdf
         ];
       shellHook = with pkgs; ''

@@ -97,6 +97,8 @@ in {
 $ sudo ifconfig enp3s0u1 10.11.99.2 netmask 255.255.255.0
 ```
 
+.. or set up NetworkManager to automatically assign IP address
+
 ### Nix-shell
 
 ```
@@ -124,5 +126,5 @@ Issues:
 ### Resync
 
 ```sh
-$ DISPLAY= resync.py -v  backup  -o _rm2sync
+$ resync.py -r remarkable -v  backup  -o _rm2sync
 ```
