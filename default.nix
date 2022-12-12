@@ -288,6 +288,34 @@ let
 
       mypython = pkgs.python3.withPackages mypyps;
 
+
+      fraga = pkgs.stdenv.mkDerivation {
+        name = "fraga-41";
+        buildInputs = [ pkgs.makeWrapper ];
+        buildCommand = ''
+          . $stdenv/setup
+          mkdir -pv $out/bin
+          put() {
+            cp $1 $out/bin
+            chmod +x $out/bin/$(basename $1)
+          }
+          putbash() {
+            put $1
+            substituteInPlace $out/bin/$(basename $1) \
+              --replace /bin/bash ${pkgs.bash}/bin/bash
+          }
+          put ${./3rdparty/fraga}/rm2svg.py
+          putbash ${./3rdparty/fraga}/pdf2rm.sh
+          putbash ${./3rdparty/fraga}/rmlist.sh
+          putbash ${./3rdparty/fraga}/rmconvert.sh
+          substituteInPlace $out/bin/rmconvert.sh \
+            --replace "\''${software}/getpageuuids.awk" ${./3rdparty/fraga/getpageuuids.awk}
+          wrapProgram $out/bin/rmconvert.sh \
+            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
+                python3 inkscape xpdf pdftk ghostscript poppler_utils])}
+        '';
+      };
+
       shell = pkgs.mkShell {
         name = "shell";
         buildInputs = [
@@ -297,6 +325,7 @@ let
           pkgs.github-cli
           # rm_tools
           python.pikepdf
+          fraga
         ];
       shellHook = with pkgs; ''
         export PATH=`pwd`/3rdparty/remarkable-cli-tooling:`pwd`/3rdparty/rMsync:$PATH
