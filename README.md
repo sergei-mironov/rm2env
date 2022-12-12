@@ -45,50 +45,56 @@ ReMarkable2 links
 * reMarkable directory structure
   - https://remarkablewiki.com/tech/filesystem
 
-### Topics
+### Synchronization
+
+- Remarkable CLI tooling https://github.com/cherti/remarkable-cli-tooling
+  + Could be up-to-date; More or less works
+  + Can't remove file from remarkable
+  + Sent Pull request and filed an issue
+    * https://github.com/cherti/remarkable-cli-tooling/issues/5
+- Prof. Fraga's page on remarkable with lots of useful scripts
+  https://www.ucl.ac.uk/~ucecesf/remarkable/
+  + [rm2pdf.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/pdf2rm.sh)
+  + [rmlist.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmlist.sh)
+  + [rmconvert.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmconvert.sh)
+  + Author e-mail `e.fraga@ucl.ac.uk`
+- https://github.com/simonschllng/rm-sync
+  + Written in pure Shell curl calls are commented-out
+  + Seems to be a local script, incomplete
+- https://github.com/lschwetlick/rMsync
+  + Another script, this time in Python
+  + Needs `rm_tools`
+  + Needs deprecated scripts
+- https://github.com/nick8325/remarkable-fs
+  + FUSE, Seems to work without the cloud
+  + 5 years old
+- https://github.com/rschroll/rmfuse
+  + Fuse between local folder and the cloud
+  + Requires `rmcl` and `rmrl`
+  + Not working anymore
+- Syncthing https://github.com/evidlo/remarkable_syncthing
+  + Requires Entware
+- https://github.com/codetist/remarkable2-cloudsync
+  + A script which uses `Rclone` binary.
+- Remi https://github.com/bordaigorl/remy
+  + GUI, Not outdated
+  + I didn't check it
+
+### Screen sharing
+
+* reMarkable mouse
+  - https://github.com/evidlo/remarkable_mouse
+  - https://github.com/kevinconway/remouseable
+* reStream https://github.com/rien/reStream
+
+### Other projects
 
 * SSH access and backups https://remarkablewiki.com/tech/ssh#ssh_access
 * Entware https://github.com/evidlo/remarkable_entware
 * `Rm_tools` https://github.com/lschwetlick/maxio/tree/master/rm_tools
 * Some nix expressions https://github.com/siraben/nix-remarkable
-
-* Remarkable mouse:
-  - https://github.com/evidlo/remarkable_mouse
-  - https://github.com/kevinconway/remouseable
-
-* Sync approaches:
-  - Remarkable CLI tooling https://github.com/cherti/remarkable-cli-tooling
-    + Could be up-to-date; More or less works
-    + Can't remove file from remarkable
-    + Sent Pull request and filed an issue
-      * https://github.com/cherti/remarkable-cli-tooling/issues/5
-  - Prof. Fraga's page on remarkable with lots of useful scripts
-    https://www.ucl.ac.uk/~ucecesf/remarkable/
-    + [rm2pdf.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/pdf2rm.sh)
-    + [rmlist.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmlist.sh)
-    + [rmconvert.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmconvert.sh)
-    + Author e-mail `e.fraga@ucl.ac.uk`
-  - https://github.com/simonschllng/rm-sync
-    + Written in pure Shell curl calls are commented-out
-    + Seems to be a local script, incomplete
-  - https://github.com/lschwetlick/rMsync
-    + Another script, this time in Python
-    + Needs `rm_tools`
-    + Needs deprecated scripts
-  - https://github.com/nick8325/remarkable-fs
-    + FUSE, Seems to work without the cloud
-    + 5 years old
-  - https://github.com/rschroll/rmfuse
-    + Fuse between local folder and the cloud
-    + Requires `rmcl` and `rmrl`
-    + Not working anymore
-  - Syncthing https://github.com/evidlo/remarkable_syncthing
-    + Requires Entware
-  - https://github.com/codetist/remarkable2-cloudsync
-    + A script which uses `Rclone` binary.
-  - Remi https://github.com/bordaigorl/remy
-    + GUI, Not outdated
-    + I didn't check it
+* Receive files from Telegram https://github.com/Davide95/remarkaBot
+  - Needs rebooting after the file is received
 
 Shell hints
 -----------
@@ -138,4 +144,12 @@ Issues:
 
 ```sh
 $ resync.py -r remarkable -v  backup  -o _rm2sync
+```
+
+
+### Rsync xochitl
+
+
+```sh
+rsync -avP -e ssh remarkable:/home/root/.local/share/remarkable/xochitl _xochitl
 ```
