@@ -14,7 +14,7 @@ Contents
    * [Linking the pointer with the Host mouse](#linking-the-pointer-with-the-host-mouse)
    * [Synchronizin using RMfuse (Broken)](#synchronizin-using-rmfuse-(broken))
 3. [Low-level actions](#low-level-actions)
-   * [Enabling the support of older SSH formats](#enabling-the-support-of-older-ssh-formats)
+   * [Enabling the support of older SSH key formats](#enabling-the-support-of-older-ssh-key-formats)
    * [Setting the Host IP to connect via USB cable](#setting-the-host-ip-to-connect-via-usb-cable)
    * [Calling resync (deprecated)](#calling-resync-(deprecated))
    * [Syncing the xochitl](#syncing-the-xochitl)
@@ -23,7 +23,6 @@ Contents
    * [Synchronization](#synchronization)
    * [Screen sharing](#screen-sharing)
    * [Other projects](#other-projects)
-
 
 Usage
 -----
@@ -52,7 +51,7 @@ Issues:
 
 Broken due to
 
-* https://github.com/rschroll/rmcl/issues/1~~
+* ~~https://github.com/rschroll/rmcl/issues/1~~
 * https://github.com/rschroll/rmfuse/issues/42
 * etc.
 
@@ -69,7 +68,7 @@ Low-level actions
 -----------------
 
 
-### Enabling the support of older SSH formats
+### Enabling the support of older SSH key formats
 
 In the Host Nix config:
 
