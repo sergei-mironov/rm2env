@@ -1,29 +1,62 @@
-About
------
+ReMarkable 2 environment
+========================
 
-This repo contains a [Nix](http://www.nixos.org) environment for Remarkable 2
-tablet device.
+This repo defines [nix-shell](http://www.nixos.org) environment which defines
+Nix build rules for various related to the
+[Remarkable2 tablet device](https://remarkable.com/store/remarkable-2).
 
-Usage
------
+Contents
+--------
 
-### Nix-shell
+1. [Contents](#contents)
+2. [Basic Usage](#basic-usage)
+   * [Entering the Environment](#entering-the-environment)
+   * [Linking the pointer with the Host mouse](#linking-the-pointer-with-the-host-mouse)
+   * [Synchronizin using RMfuse (Broken)](#synchronizin-using-rmfuse-(broken))
+3. [Low-level actions](#low-level-actions)
+   * [Enabling the support of older SSH formats](#enabling-the-support-of-older-ssh-formats)
+   * [Setting the Host IP to connect via USB cable](#setting-the-host-ip-to-connect-via-usb-cable)
+   * [Calling resync (deprecated)](#calling-resync-(deprecated))
+   * [Syncing the xochitl](#syncing-the-xochitl)
+4. [Resources](#resources)
+   * [General](#general)
+   * [Synchronization](#synchronization)
+   * [Screen sharing](#screen-sharing)
+   * [Other projects](#other-projects)
+
+
+Basic Usage
+-----------
+
+### Entering the Environment
 
 ```sh
 $ nix-shell -A shell
 ```
 
-### Remarkable mouse
+### Linking the pointer with the Host mouse
+
+Connect the device to Host and do the following
 
 ```sh
 $ echo 'password' >_pass.txt
 $ ./runmouse.sh
 ```
 
-* ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
-  + Specifying --password seems to have no effect
+Issues:
 
-### RMfuse
+* ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
+  + Specifying --password seems to have no effect (Fixed)
+
+### Synchronizin using RMfuse (Broken)
+
+Broken due to
+
+* https://github.com/rschroll/rmcl/issues/1~~
+* https://github.com/rschroll/rmfuse/issues/42
+* etc.
+
+Used to work as follows:
 
 ```sh
 $ nix-build -A rmfuse
@@ -32,8 +65,47 @@ $ ./result/bin/rmfuse -v _remarkable
 ```
 
 
-ReMarkable2 links
+Low-level actions
 -----------------
+
+
+### Enabling the support of older SSH formats
+
+In the Host Nix config:
+
+```nix
+programs.ssh = let
+  algos = ["rsa-sha2-256" "rsa-sha2-512" "ssh-ed25519" "ssh-rsa" "ssh-dss"];
+in {
+  hostKeyAlgorithms = algos;
+  pubkeyAcceptedKeyTypes = algos;
+};
+```
+
+### Setting the Host IP to connect via USB cable
+
+```sh
+$ sudo ifconfig enp3s0u1 10.11.99.2 netmask 255.255.255.0
+```
+
+.. or set up NetworkManager to automatically assign IP address
+
+
+### Calling resync (deprecated)
+
+```sh
+$ resync.py -r remarkable -v  backup  -o _rm2sync
+```
+
+
+### Syncing the xochitl
+
+```sh
+rsync -avP -e ssh remarkable:/home/root/.local/share/remarkable/xochitl _xochitl
+```
+
+Resources
+---------
 
 ### General
 
@@ -95,61 +167,3 @@ ReMarkable2 links
 * Some nix expressions https://github.com/siraben/nix-remarkable
 * Receive files from Telegram https://github.com/Davide95/remarkaBot
   - Needs rebooting after the file is received
-
-Shell hints
------------
-
-### Setting host IP
-
-```nix
-programs.ssh = let
-  algos = ["rsa-sha2-256" "rsa-sha2-512" "ssh-ed25519" "ssh-rsa" "ssh-dss"];
-in {
-  hostKeyAlgorithms = algos;
-  pubkeyAcceptedKeyTypes = algos;
-};
-```
-
-```sh
-$ sudo ifconfig enp3s0u1 10.11.99.2 netmask 255.255.255.0
-```
-
-.. or set up NetworkManager to automatically assign IP address
-
-### Nix-shell
-
-```
-$ nix-shell -A shell
-```
-
-### RMfuse
-
-* ~~https://github.com/rschroll/rmcl/issues/1~~
-* Not working anymore due to Cloud API change
-
-```
-$ nix-build -A rmfuse
-$ mkdir _remarkable
-$ ./result/bin/rmfuse -v _remarkable
-```
-
-### Remouse
-
-Issues:
-* ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
-  + Specifying --password seems to have no effect
-
-
-### Resync
-
-```sh
-$ resync.py -r remarkable -v  backup  -o _rm2sync
-```
-
-
-### Rsync xochitl
-
-
-```sh
-rsync -avP -e ssh remarkable:/home/root/.local/share/remarkable/xochitl _xochitl
-```
