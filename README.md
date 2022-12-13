@@ -74,7 +74,7 @@ In the Host Nix config:
 
 ```nix
 programs.ssh = let
-  algos = ["rsa-sha2-256" "rsa-sha2-512" "ssh-ed25519" "ssh-rsa" "ssh-dss"];
+  algos = ["+ssh-rsa"];
 in {
   hostKeyAlgorithms = algos;
   pubkeyAcceptedKeyTypes = algos;
@@ -99,8 +99,16 @@ $ resync.py -r remarkable -v  backup  -o _rm2sync
 
 ### Syncing the xochitl
 
+Remarkable->Host transfer with deletion (remove --dry-run)
+
 ```sh
-rsync -avP -e ssh remarkable:/home/root/.local/share/remarkable/xochitl _xochitl
+$ rsync -avP --dry-run --delete -e ssh remarkable:/home/root/.local/share/remarkable/xochitl/ _xochitl
+```
+
+Host->Remarkable transfer without deletion (remove --dry-run)
+
+```sh
+$ rsync -avP --dry-run -e ssh _xochitl remarkable:/home/root/.local/share/remarkable/xochitl/
 ```
 
 Resources
