@@ -67,7 +67,6 @@ $ ./result/bin/rmfuse -v _remarkable
 Low-level actions
 -----------------
 
-
 ### Enabling the support of older SSH key formats
 
 In the Host Nix config:
