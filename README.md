@@ -101,13 +101,13 @@ $ resync.py -r remarkable -v  backup  -o _rm2sync
 Remarkable->Host transfer with deletion (remove --dry-run)
 
 ```sh
-$ rsync -avP --dry-run --delete -e ssh remarkable:/home/root/.local/share/remarkable/xochitl/ _xochitl
+$ rsync -i -avP --dry-run --delete -e ssh remarkable:/home/root/.local/share/remarkable/xochitl/ _xochitl/
 ```
 
 Host->Remarkable transfer without deletion (remove --dry-run)
 
 ```sh
-$ rsync -avP --dry-run -e ssh _xochitl remarkable:/home/root/.local/share/remarkable/xochitl/
+$ rsync -i -avP --no-owner --no-group --dry-run -e ssh _xochitl/ remarkable:/home/root/.local/share/remarkable/xochitl/
 ```
 
 Resources
