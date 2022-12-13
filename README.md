@@ -9,7 +9,7 @@ Contents
 --------
 
 1. [Contents](#contents)
-2. [Basic Usage](#basic-usage)
+2. [Usage](#usage)
    * [Entering the Environment](#entering-the-environment)
    * [Linking the pointer with the Host mouse](#linking-the-pointer-with-the-host-mouse)
    * [Synchronizin using RMfuse (Broken)](#synchronizin-using-rmfuse-(broken))
@@ -25,8 +25,8 @@ Contents
    * [Other projects](#other-projects)
 
 
-Basic Usage
------------
+Usage
+-----
 
 ### Entering the Environment
 
