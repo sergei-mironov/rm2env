@@ -67,6 +67,23 @@ $ ./result/bin/rmfuse -v _remarkable
 Low-level actions
 -----------------
 
+### Accessing Remarkable from Host via third-party Server using SSH forwarding
+
+We need a third-party Server where SSH is controlled. Lets say its
+`~/.ssh/config` credentials has name `vps`. 4349 is a free port to listen on
+`vps`.
+
+```sh
+RM $ ssh -R0.0.0.0:4349:127.0.0.1:22 vps
+```
+```sh
+HOST $ ssh -o "ProxyCommand ssh vps nc 127.0.0.1 4349" remarkable
+```
+
+<!-- * Current IP `192.168.6.91` -->
+<!-- * Wiki page on WiFi issues https://remarkablewiki.com/tips/wifi -->
+
+
 ### Enabling the support of older SSH key formats
 
 In the Host Nix config:
@@ -173,3 +190,4 @@ Resources
 * Some nix expressions https://github.com/siraben/nix-remarkable
 * Receive files from Telegram https://github.com/Davide95/remarkaBot
   - Needs rebooting after the file is received
+

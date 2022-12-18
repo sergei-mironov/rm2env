@@ -325,10 +325,16 @@ let
           pkgs.github-cli
           # rm_tools
           python.pikepdf
+
           fraga
+          pkgs.inkscape
+          pkgs.xpdf
+          pkgs.pdftk
+          pkgs.ghostscript
+          pkgs.poppler_utils
         ];
       shellHook = with pkgs; ''
-        export PATH=`pwd`/3rdparty/remarkable-cli-tooling:`pwd`/3rdparty/rMsync:$PATH
+        export PATH=`pwd`/sh:`pwd`/3rdparty/remarkable-cli-tooling:`pwd`/3rdparty/rMsync:$PATH
         export PYTHONPATH=`pwd`/python:$PYTHONPATH
         export LD_LIBRARY_PATH=${pkgs.libevdev}/lib/:${pkgs.xorg.libX11}/lib:${pkgs.xorg.libXrandr}/lib
       '';
