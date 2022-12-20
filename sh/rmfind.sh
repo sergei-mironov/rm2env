@@ -26,7 +26,7 @@ fi
 
 test -f "$F"
 rmcheck
-rmlist.sh "$RM_XOCHITL" >$CACHE
+rmls.sh >$CACHE
 
 FN=$(basename "$F" .pdf)
 grep --fixed-strings "$FN" "$CACHE" | awk '{print $1}'

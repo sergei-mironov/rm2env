@@ -6,7 +6,7 @@ set -e -x
 
 CACHE=/tmp/rmfind_$UID.txt
 LOG=/tmp/rmadd_$UID.txt
-rmlist.sh "$RM_XOCHITL" >$CACHE
+rmls.sh >$CACHE
 
 N=0
 OK=0
