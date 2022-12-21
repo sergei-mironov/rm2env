@@ -62,26 +62,26 @@ a thirdparty server with a public IP address.
 
 From the user's point of view, the overall process works as follows:
 
-1. Set explicitly or modify the configuration environment variables in the
-   [rmcommon.sh](./sh/rmcommon.sh).
-2. (Optional) Call [install-sshR](./sh/install-sshR.sh) to install the systemd
-   rule to the remarkable device and the SSH key to third-party server with
-   public IP as configured with configuration variables. If you don't have one,
+1. [rmcommon.sh](./sh/rmcommon.sh) controls the configuration environment
+   variables.
+2. [install-sshR](./sh/install-sshR.sh) (Optional) installs the systemd
+   rule to the remarkable device and the SSH key to a third-party server with
+   public IP as configured by configuration variables. If you don't have one,
    you can still use the default USB wire to get a direct SSH connection. This
    step typically has to be performed once after every remarkable update.
-3. Call [rmpull.sh](./sh/rmpull.sh) to pull the whole `xochitl`
+3. [rmpull.sh](./sh/rmpull.sh) pulls the whole `xochitl`
    folder from Remarkable device to the host using the `rsync` tool. `rmpull.sh`
    removes all extra files that don't present on the tablet.
 4. Modify the Host-version of `xochitl`, such as:
-   - List its contents with [rmls.sh](./sh/rmls.sh)
-   - Get the document's UUID by name with [rmfind](./sh/rmfind.sh)
-   - Get the annotated PDF by UUID using the Dr.Fraga's
-     [rmconvert](./3rdparty/fraga/rmconvert.sh)
+   - [rmls.sh](./sh/rmls.sh) Lists the folder's content
+   - [rmfind.sh](./sh/rmfind.sh) Gets the document UUID by name
+   - [rmconvert.sh](./3rdparty/fraga/rmconvert.sh) of Dr.Fraga builds the
+     annotated PDF by UUID.
      + Currently, getting annotaded documents doesn't rely on the Remarkable
        web-server.  Unfortunately, `rmconvert` is pretty slow and has some
        issues with SVG graphics in PDF documents.
-   - Add a new document using [rmadd.sh](./sh/rmadd.sh)
-5. Use [rmpush.sh](./sh/rmpush.sh) to push the Host's `xochitl` back to the
+   - [rmadd.sh](./sh/rmadd.sh) adds new document
+5. [rmpush.sh](./sh/rmpush.sh) pushes Host's `xochitl` back to the
    device. `rmpush.sh` doesn't remove anything from the table. Use the tablet
    GUI for the removal.
 
