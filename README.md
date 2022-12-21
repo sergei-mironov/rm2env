@@ -2,8 +2,7 @@ ReMarkable 2 environment
 ========================
 
 This ia a [Nix-shell](http://www.nixos.org) environment which contains Nix build
-rules for various software, related to the [Remarkable2 tablet
-device](https://remarkable.com/store/remarkable-2).
+rules for various software, related to [Remarkable2 tablet](https://remarkable.com/store/remarkable-2).
 
 Contents
 --------
