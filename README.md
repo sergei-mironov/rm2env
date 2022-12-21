@@ -12,11 +12,12 @@ Contents
 2. [Usage](#usage)
    * [Entering the Environment](#entering-the-environment)
    * [Linking the pointer with the Host mouse](#linking-the-pointer-with-the-host-mouse)
-   * [Synchronizin using RMfuse (Broken)](#synchronizin-using-rmfuse-(broken))
+   * [Synchronizing through SSH](#synchronizing-through-ssh)
 3. [Low-level actions](#low-level-actions)
+   * [Accessing Remarkable from Host via third-party Server using SSH forwarding](#accessing-remarkable-from-host-via-third-party-server-using-ssh-forwarding)
    * [Enabling the support of older SSH key formats](#enabling-the-support-of-older-ssh-key-formats)
    * [Setting the Host IP to connect via USB cable](#setting-the-host-ip-to-connect-via-usb-cable)
-   * [Calling resync (deprecated)](#calling-resync-(deprecated))
+   * [Calling resync DEPRECATED](#calling-resync-deprecated)
    * [Syncing the xochitl](#syncing-the-xochitl)
 4. [Resources](#resources)
    * [General](#general)
@@ -28,6 +29,10 @@ Usage
 -----
 
 ### Entering the Environment
+
+The scripts depend on a number of third-party tools for PDF editing. Entering
+the environment means to install all the required tools and open the shell where
+they are available.
 
 ```sh
 $ nix-shell -A shell
@@ -47,22 +52,38 @@ Issues:
 * ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
   + Specifying --password seems to have no effect (Fixed)
 
-### Synchronizin using RMfuse (Broken)
+### Synchronizing through SSH
 
-Broken due to
+This repository includes a set of shell-scripts inspired by [Dr Fraga's
+approach](https://www.ucl.ac.uk/~ucecesf/remarkable/). In contrast to Dr. Fraga,
+I use `rsync` rather then `fuse` mounts. My scripts are also compatible with a
+[systemd rule for SSH proxying](./sh/install-sshR.sh) which relies on
+a thirdparty server with a public IP address.
 
-* ~~https://github.com/rschroll/rmcl/issues/1~~
-* https://github.com/rschroll/rmfuse/issues/42
-* etc.
+From the user's point of view, the overall process works as follows:
 
-Used to work as follows:
-
-```sh
-$ nix-build -A rmfuse
-$ mkdir _remarkable
-$ ./result/bin/rmfuse -v _remarkable
-```
-
+1. Set explicitly or modify the configuration environment variables in the
+   [rmcommon.sh](./sh/rmcommon.sh).
+2. (Optional) Call [install-sshR](./sh/install-sshR.sh) to install the systemd
+   rule to the remarkable device and the SSH key to third-party server with
+   public IP as configured with configuration variables. If you don't have one,
+   you can still use the default USB wire to get a direct SSH connection. This
+   step typically has to be performed once after every remarkable update.
+3. Call [rmpull.sh](./sh/rmpull.sh) to pull the whole `xochitl`
+   folder from Remarkable device to the host using the `rsync` tool. `rmpull.sh`
+   removes all extra files that don't present on the tablet.
+4. Modify the Host-version of `xochitl`, such as:
+   - List its contents with [rmls.sh](./sh/rmls.sh)
+   - Get the document's UUID by name with [rmfind](./sh/rmfind.sh)
+   - Get the annotated PDF by UUID using the Dr.Fraga's
+     [rmconvert](./3rdparty/fraga/rmconvert.sh)
+     + Currently, getting annotaded documents doesn't rely on the Remarkable
+       web-server.  Unfortunately, `rmconvert` is pretty slow and has some
+       issues with SVG graphics in PDF documents.
+   - Add a new document using [rmadd.sh](./sh/rmadd.sh)
+5. Use [rmpush.sh](./sh/rmpush.sh) to push the Host's `xochitl` back to the
+   device. `rmpush.sh` doesn't remove anything from the table. Use the tablet
+   GUI for the removal.
 
 Low-level actions
 -----------------
@@ -106,7 +127,7 @@ $ sudo ifconfig enp3s0u1 10.11.99.2 netmask 255.255.255.0
 .. or set up NetworkManager to automatically assign IP address
 
 
-### Calling resync (deprecated)
+### Calling resync DEPRECATED
 
 ```sh
 $ resync.py -r remarkable -v  backup  -o _rm2sync
