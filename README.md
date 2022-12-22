@@ -10,8 +10,8 @@ Contents
 1. [Contents](#contents)
 2. [Usage](#usage)
    * [Entering the Environment](#entering-the-environment)
-   * [Linking the pointer with the Host mouse](#linking-the-pointer-with-the-host-mouse)
    * [Synchronizing through SSH](#synchronizing-through-ssh)
+   * [Linking the pointer with the Host mouse cursor](#linking-the-pointer-with-the-host-mouse-cursor)
 3. [Low-level actions](#low-level-actions)
    * [Accessing Remarkable from Host via third-party Server using SSH forwarding](#accessing-remarkable-from-host-via-third-party-server-using-ssh-forwarding)
    * [Enabling the support of older SSH key formats](#enabling-the-support-of-older-ssh-key-formats)
@@ -37,20 +37,6 @@ they are available.
 $ nix-shell -A shell
 ```
 
-### Linking the pointer with the Host mouse
-
-Connect the device to Host and do the following
-
-```sh
-$ echo 'password' >_pass.txt
-$ ./runmouse.sh
-```
-
-Issues:
-
-* ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
-  + Specifying --password seems to have no effect (Fixed)
-
 ### Synchronizing through SSH
 
 This repository includes a set of shell-scripts inspired by [Dr Fraga's
@@ -70,7 +56,7 @@ From the user's point of view, the overall process works as follows:
    step typically has to be performed once after every remarkable update.
 3. [rmpull.sh](./sh/rmpull.sh) pulls the whole `xochitl`
    folder from Remarkable device to the host using the `rsync` tool. `rmpull.sh`
-   removes all extra files that don't present on the tablet.
+   removes all extra files on the Host that don't present on the tablet.
 4. Modify the Host-version of `xochitl`, such as:
    - [rmls.sh](./sh/rmls.sh) Lists the folder's content
    - [rmfind.sh](./sh/rmfind.sh) Gets the document UUID by name
@@ -83,6 +69,21 @@ From the user's point of view, the overall process works as follows:
 5. [rmpush.sh](./sh/rmpush.sh) pushes Host's `xochitl` back to the
    device. `rmpush.sh` doesn't remove anything from the table. Use the tablet
    GUI for the removal.
+
+
+### Linking the pointer with the Host mouse cursor
+
+Connect the device to Host and do the following
+
+```sh
+$ echo 'password' >_pass.txt
+$ ./runmouse.sh
+```
+
+Issues:
+
+* ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
+  + Specifying --password seems to have no effect (Fixed)
 
 Low-level actions
 -----------------
