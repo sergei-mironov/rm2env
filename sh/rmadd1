@@ -2,7 +2,7 @@
 
 F="$1"
 
-. $(dirname $0)/rmcommon.sh
+. $(dirname $0)/rmcommon
 
 if ! test -f "$F" ; then
   rmdie "File ($F) not found"

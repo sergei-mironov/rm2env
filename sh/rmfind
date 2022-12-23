@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $(dirname $0)/rmcommon.sh
+. $(dirname $0)/rmcommon
 
 F=
 CACHE=
@@ -26,7 +26,7 @@ fi
 
 test -f "$F"
 rmcheck
-rmls.sh >$CACHE
+rmls >$CACHE
 
 FN=$(basename "$F" .pdf)
 grep --fixed-strings "$FN" "$CACHE" | awk '{print $1}'

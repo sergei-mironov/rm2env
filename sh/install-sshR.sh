@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $(dirname $0)/rmcommon.sh
+. $(dirname $0)/rmcommon
 
 set -e -x
 
@@ -46,7 +46,7 @@ scp ./_sshR.service $RM_SSH:/etc/systemd/system/sshR.service
 ssh $RM_SSH 'systemctl daemon-reload && systemctl start sshR.service'
 
 # scp ./remarkabot root@"$1":/opt/remarkabot/remarkabot
-# scp ./scripts/run.sh root@"$1":/opt/remarkabot/run.sh
+# scp ./scripts/run root@"$1":/opt/remarkabot/run
 # scp ./systemd/remarkabot.service root@"$1":/etc/systemd/system/remarkabot.service
 # scp ./systemd/remarkabot.timer root@"$1":/etc/systemd/system/remarkabot.timer
 # scp ./systemd/.env root@"$1":/home/root/.config/remarkabot/.env
