@@ -13,4 +13,7 @@ done
 set -e -x
 
 mkdir "$RM_XOCHITL" || true
+if ! test -d "$RM_XOCHITL" ; then
+  rmdie "RM_XOCHITL($RM_XOCHITL) is not a directory"
+fi
 rsync -i -avP $DRYRUN --delete -e "rmssh" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/"

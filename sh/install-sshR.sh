@@ -7,11 +7,25 @@ set -e -x
 if test -z "$RM_VPSSSH" ; then
   rmdie "RM_VPSSSH should be set and working"
 fi
+if test "$RM_VPSIP" = "$RM_NOIP"; then
+  RM_VPSIP=$(ssh -G "$RM_VPSSSH" | awk '/^hostname / {print $2}')
+  if test -z "$RM_VPSIP" ; then
+    rmdie "Could not deduce RM_VPSIP from '$RM_VPSSSH'"
+  fi
+fi
 if test "$RM_VPSUSER" = "$RM_NOUSER"; then
-  rmdie "Invalid RM_VPSUSER($RM_VPSUSER)"
+  RM_VPSUSER=$(ssh -G "$RM_VPSSSH" | awk '/^user / {print $2}')
+  if test -z "$RM_VPSUSER" ; then
+    RM_VPSUSER="$USER"
+  fi
+  rmwarn "Deduced RM_VPSUSER is '$RM_VPSUSER'"
 fi
 if test "$RM_VPSPORT" = "$RM_NOPORT"; then
-  rmdie "Invalid RM_VPSPORT($RM_PORT)"
+  RM_VPSPORT=$(ssh -G "$RM_VPSSSH" | awk '/^port / {print $2}')
+  if test -z "$RM_VPSPORT" ; then
+    RM_VPSPORT=22
+  fi
+  rmwarn "Deduced RM_VPPORT is '$RM_VPSPORT'"
 fi
 
 ssh $RM_SSH mkdir .ssh || true

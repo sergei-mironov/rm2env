@@ -1,3 +1,4 @@
+#!/bin/sh
 
 rmset() {
   if eval "test -z \"\$$1\"" ; then
@@ -7,14 +8,20 @@ rmset() {
 
 RM_NOUSER="<INVALID_USER>"
 RM_NOIP="<INVALID_IP>"
+RM_NOPORT="<INVALID_PORT>"
 
-rmset RM_SSH remarkable
-rmset RM_XOCHITL $HOME/.xochitl
-rmset RM_VPSIP "$RM_NOIP"
-rmset RM_VPSUSER "$RM_NOUSER"
-rmset RM_VPSPORT 2222
-rmset RM_VPSRPORT 4349
-rmset RM_VPSSSH vps
+if test -f "$(dirname "$0")/rmconfig" ; then
+  . $(dirname "$0")/rmconfig
+else
+  rmset RM_XOCHITL $HOME/.xochitl
+  rmset RM_SSH remarkable
+  rmset RM_VPSSSH ""
+  rmset RM_VPSRPORT "$RM_NOPORT"
+
+  rmset RM_VPSIP "$RM_NOIP" # Optional
+  rmset RM_VPSUSER "$RM_NOUSER" # Optional
+  rmset RM_VPSPORT "$RM_NOPORT" # Optional
+fi
 
 rmecho() {
   echo "$@"

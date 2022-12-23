@@ -34,7 +34,8 @@ the environment means to install all the required tools and open the shell where
 they are available.
 
 ```sh
-$ nix-shell -A shell
+$ export NIXPKGS_ALLOW_INSECURE=1 # needed for buggy xpdf
+$ nix develop --impure
 ```
 
 ### Synchronizing through SSH
@@ -49,7 +50,7 @@ From the user's point of view, the overall process works as follows:
 
 1. [rmcommon](./sh/rmcommon) controls the configuration environment
    variables.
-2. [install-sshR](./sh/install-sshR) (Optional) installs the systemd
+2. [install-sshR](./sh/install-sshR.sh) (Optional) installs the systemd
    rule to the remarkable device and the SSH key to a third-party server with
    public IP as configured by configuration variables. If you don't have one,
    you can still use the default USB wire to get a direct SSH connection. This

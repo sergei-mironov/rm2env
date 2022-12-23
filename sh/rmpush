@@ -18,7 +18,7 @@ while test -n "$1" ; do
   shift
 done
 
-set -e -x
+set -e
 
 rmcheck
 

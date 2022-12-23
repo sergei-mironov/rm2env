@@ -322,6 +322,60 @@ let
         '';
       };
 
+      rmsynctools_defconfig = {
+        ssh = "remarkable";
+        vpsssh = "vps";
+        vpsrport = 4349;
+        xochitl = "\\$HOME/.xochitl";
+      };
+
+      rmsynctools = config : pkgs.stdenv.mkDerivation {
+        name = "rmsynctools";
+        buildInputs = [ pkgs.makeWrapper ];
+        buildCommand = ''
+          . $stdenv/setup
+          mkdir -pv $out/bin
+          put() {
+            cp -v "$1" "$out/bin/$(basename $1 .sh)"
+            chmod +x "$out/bin/$(basename $1 .sh)"
+          }
+          putbash() {
+            put "$1"
+            substituteInPlace "$out/bin/$(basename $1 .sh)" \
+              --replace /bin/bash ${pkgs.bash}/bin/bash
+          }
+          cat >$out/bin/rmconfig <<EOF
+          rmset RM_SSH ${config.ssh}
+          rmset RM_VPSSSH ${config.vpsssh}
+          rmset RM_XOCHITL ${config.xochitl}
+          rmset RM_VPSRPORT ${toString config.vpsrport}
+          EOF
+
+          put ${./sh}/install-sshR.sh
+          put ${./sh}/rmcommon
+          put ${./sh}/rmadd
+          put ${./sh}/rmfind
+          put ${./sh}/rmls
+          put ${./sh}/rmpull
+          put ${./sh}/rmpush
+          put ${./sh}/rmssh
+
+          putbash ${./sh}/rmadd1
+          wrapProgram $out/bin/rmadd1 \
+            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
+                imagemagick])}
+
+          putbash ${./3rdparty/fraga}/rmconvert.sh
+          substituteInPlace $out/bin/rmconvert \
+            --replace "\''${software}/getpageuuids.awk" ${./3rdparty/fraga/getpageuuids.awk}
+          wrapProgram $out/bin/rmconvert \
+            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
+                python3 inkscape xpdf pdftk ghostscript poppler_utils])}
+        '';
+      };
+
+      rmsynctools_def = rmsynctools rmsynctools_defconfig;
+
       shell = pkgs.mkShell {
         name = "shell";
         buildInputs = [

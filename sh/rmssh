@@ -2,4 +2,11 @@
 
 . $(dirname $0)/rmcommon
 
-exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc -w 5 127.0.0.1 $RM_VPSRPORT" "$@"
+if test -n "$RM_VPSSSH" ; then
+  if test "$RM_VPSRPORT" = "$RM_NOPORT" ; then
+    rmdie "RM_VPSSSH is set, but RM_VPSRPORT does not"
+  fi
+  exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc -w 5 127.0.0.1 $RM_VPSRPORT" "$@"
+else
+  exec ssh "$@"
+fi
