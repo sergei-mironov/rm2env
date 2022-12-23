@@ -91,7 +91,13 @@ let
 
         nativeBuildInputs = [ pkgs.libevdev ];
 
-        src = ./3rdparty/remarkable_mouse;
+        # src = ./3rdparty/remarkable_mouse;
+        src = pkgs.fetchFromGitHub {
+          owner = "evidlo";
+          repo = "remarkable_mouse";
+          rev = "30b8a7b7131f652a7b162144a7b4c911fcc6eb7c";
+          sha256 = "sha256-myPtNAjEK8BUU4imtiF4HlPOwng4XVgfKuWgP60sttw=";
+        };
       };
 
       inherit (python) llfuse;
