@@ -1,7 +1,13 @@
 {
   description = "ReMarkable2 developement environment";
 
-  nixConfig.bash-prompt = "\[rm2env-develop\]$ ";
+  nixConfig = {
+    bash-prompt = "\[rm2env-develop\]$ ";
+
+    permittedInsecurePackages = [
+      "xpdf-4.04"
+    ];
+  };
 
   # inputs.nixpkgs.url = "github:grwlf/nixpkgs/local13";
   inputs = {
