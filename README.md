@@ -42,32 +42,32 @@ $ nix-shell -A shell
 This repository includes a set of shell-scripts inspired by [Dr Fraga's
 approach](https://www.ucl.ac.uk/~ucecesf/remarkable/). In contrast to Dr. Fraga,
 I use `rsync` rather then `fuse` mounts. My scripts are also compatible with a
-[systemd rule for SSH proxying](./sh/install-sshR.sh) which relies on
+[systemd rule for SSH proxying](./sh/install-sshR) which relies on
 a thirdparty server with a public IP address.
 
 From the user's point of view, the overall process works as follows:
 
-1. [rmcommon.sh](./sh/rmcommon.sh) controls the configuration environment
+1. [rmcommon](./sh/rmcommon) controls the configuration environment
    variables.
-2. [install-sshR](./sh/install-sshR.sh) (Optional) installs the systemd
+2. [install-sshR](./sh/install-sshR) (Optional) installs the systemd
    rule to the remarkable device and the SSH key to a third-party server with
    public IP as configured by configuration variables. If you don't have one,
    you can still use the default USB wire to get a direct SSH connection. This
    step typically has to be performed once after every remarkable update.
-3. [rmpull.sh](./sh/rmpull.sh) pulls the whole `xochitl`
-   folder from Remarkable device to the host using the `rsync` tool. `rmpull.sh`
+3. [rmpull](./sh/rmpull) pulls the whole `xochitl`
+   folder from Remarkable device to the host using the `rsync` tool. `rmpull`
    removes all extra files on the Host that don't present on the tablet.
 4. Modify the Host-version of `xochitl`, such as:
-   - [rmls.sh](./sh/rmls.sh) Lists the folder's content
-   - [rmfind.sh](./sh/rmfind.sh) Gets the document UUID by name
-   - [rmconvert.sh](./3rdparty/fraga/rmconvert.sh) of Dr.Fraga builds the
+   - [rmls](./sh/rmls) Lists the folder's content
+   - [rmfind](./sh/rmfind) Gets the document UUID by name
+   - [rmconvert](./3rdparty/fraga/rmconvert) of Dr.Fraga builds the
      annotated PDF by UUID.
      + Currently, getting annotaded documents doesn't rely on the Remarkable
        web-server.  Unfortunately, `rmconvert` is pretty slow and has some
        issues with SVG graphics in PDF documents.
-   - [rmadd.sh](./sh/rmadd.sh) adds new document
-5. [rmpush.sh](./sh/rmpush.sh) pushes Host's `xochitl` back to the
-   device. `rmpush.sh` doesn't remove anything from the table. Use the tablet
+   - [rmadd](./sh/rmadd) adds new document
+5. [rmpush](./sh/rmpush) pushes Host's `xochitl` back to the
+   device. `rmpush` doesn't remove anything from the table. Use the tablet
    GUI for the removal.
 
 
