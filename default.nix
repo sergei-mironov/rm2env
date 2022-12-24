@@ -327,9 +327,7 @@ let
         vpsssh = "vps";
         vpsrport = 4349;
         xochitl = "\\$HOME/.xochitl";
-        extraConfig = ''
-          rmset RM_GUIARGS "--width=800 --icon=${./remarkable.ico}"
-        '';
+        guiargs = "--width=800 --icon=${./remarkable.ico} --title='Remarkable sync'";
       };
 
       rmsynctools = config : pkgs.stdenv.mkDerivation (
@@ -349,7 +347,8 @@ let
             put "$1"
             wrapProgram "$out/bin/$(basename $1 .sh)" \
               --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                yad python3 inkscape xpdf pdftk ghostscript poppler_utils])}
+                yad python3 inkscape xpdf pdftk ghostscript poppler_utils])} \
+              --prefix PATH : $out/bin
           }
           putbash() {
             put "$1"
@@ -357,18 +356,20 @@ let
               --replace /bin/bash ${pkgs.bash}/bin/bash
             wrapProgram "$out/bin/$(basename $1 .sh)" \
               --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                yad python3 inkscape xpdf pdftk ghostscript poppler_utils])}
+                yad python3 inkscape xpdf pdftk ghostscript poppler_utils])} \
+              --prefix PATH : $out/bin
           }
           cat >$out/bin/rmconfig <<EOF
           rmset RM_SSH ${C.ssh}
           rmset RM_VPSSSH ${C.vpsssh}
           rmset RM_XOCHITL ${C.xochitl}
           rmset RM_VPSRPORT ${toString C.vpsrport}
+          rmset RM_GUIARGS "${C.guiargs}"
           ${C.extraConfig}
           EOF
 
+          put ${./sh}/rmcommon
           putsh ${./sh}/install-sshR.sh
-          putsh ${./sh}/rmcommon
           putsh ${./sh}/rmadd
           putsh ${./sh}/rmfind
           putsh ${./sh}/rmls
