@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+. $(dirname $0)/rmcommon
+
+INPUT=''
+OUTPUT=''
+while test -n "$1" ; do
+  case "$1" in
+    --gui) RM_GUI=y ;;
+    --no-gui) RM_GUI=n ;;
+    --dry-run) RM_DRYRUN=y;;
+    -v|--verbose) RM_VERBOSE=y ;;
+    -o) OUTPUT=$2; shift ;;
+    *) INPUT="$1" ;;
+  esac
+  shift
+done
+
+set -e
+if test "$RM_VERBOSE" = "y" ; then
+  set -x
+fi
+rmcheck
+test -f "$INPUT"
+if test -z "$OUTPUT" ; then
+  D=$(dirname "$INPUT")
+  F=$(basename "$INPUT" .pdf)
+  OUTPUT="$D/$F #$RM_AMARKER.pdf"
+fi
+if test -f "$OUTPUT"; then
+  rmdie "Annotated output '$OUTPUT' already exists"
+fi
+
+CACHE=/tmp/rmget_$UID.txt
+rmls | grep -v /trash/ >$CACHE
+
+bash $(dirname $0)/rmconvert $(rmfind "$CACHE" "$INPUT") "$OUTPUT"
