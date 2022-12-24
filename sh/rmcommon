@@ -53,21 +53,22 @@ mkprogress() {
   test -d "$d" || return 1
   rm "$d/fifo" || true
   mkfifo "$d/fifo"
-  (IFS=' '; yad $RM_GUIARGS --progress --pulsate --title="$title" < "$d/fifo";) &
-  echo "$!" > "$d/yad.pid"
+  (IFS=' '; yad $RM_GUIARGS --progress --title="$title" "$3" < "$d/fifo" &
+    echo "$!" > "$d/yad.pid"
+  )
   exec 5>"$d/fifo"
   RM_PF="5"
 }
 
 killprogress() {
   # Cleanup progressbar resources
+  RM_PF="1"
   test "$RM_GUI" = "y" || return 0
   d="$1"
   test -d "$d" || return 1
-  kill $(cat "$d/yad.pid") || true
   rm "$d/fifo" || true
   exec 5>&- || true
-  RM_PF="1"
+  kill $(cat "$d/yad.pid")
 }
 
 echoprogress() {

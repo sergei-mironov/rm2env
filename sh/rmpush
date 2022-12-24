@@ -21,7 +21,7 @@ set -e
 rmcheck
 
 T=$(mktemp -d --tmpdir)
-mkprogress "$T" "Checking the connection"
+mkprogress "$T" "Checking the connection" "--pulsate"
 trap "killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
 while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
   echoprogress "$T" "Checking the connection"
@@ -29,12 +29,12 @@ while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
 done
 killprogress "$T"
 
-mkprogress "$T" "Fetching from Remarkable"
+mkprogress "$T" "Fetching from Remarkable" "--pulsate"
 rsync --out-format='#Receiving:%n%L' $RSYNC_VERBOSE -i -aP $RM_DRYRUN -e "rmssh" \
   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" >&$RM_PF
 killprogress "$T"
 
-mkprogress "$T" "Pushing to Remarkable"
+mkprogress "$T" "Pushing to Remarkable" "--pulsate"
 rsync --out-format='#Sending:%n%L' $RSYNC_VERBOSE -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
   "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" >&$RM_PF
 killprogress "$T"
