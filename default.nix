@@ -332,7 +332,10 @@ let
         '';
       };
 
-      rmsynctools = config : pkgs.stdenv.mkDerivation {
+      rmsynctools = config : pkgs.stdenv.mkDerivation (
+        let
+          C = { extraConfig = ""; } // config;
+        in {
         name = "rmsynctools";
         buildInputs = [ pkgs.makeWrapper ];
         buildCommand = ''
@@ -342,41 +345,43 @@ let
             cp -v "$1" "$out/bin/$(basename $1 .sh)"
             chmod +x "$out/bin/$(basename $1 .sh)"
           }
+          putsh() {
+            put "$1"
+            wrapProgram "$out/bin/$(basename $1 .sh)" \
+              --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
+                yad python3 inkscape xpdf pdftk ghostscript poppler_utils])}
+          }
           putbash() {
             put "$1"
             substituteInPlace "$out/bin/$(basename $1 .sh)" \
               --replace /bin/bash ${pkgs.bash}/bin/bash
+            wrapProgram "$out/bin/$(basename $1 .sh)" \
+              --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
+                yad python3 inkscape xpdf pdftk ghostscript poppler_utils])}
           }
           cat >$out/bin/rmconfig <<EOF
-          rmset RM_SSH ${config.ssh}
-          rmset RM_VPSSSH ${config.vpsssh}
-          rmset RM_XOCHITL ${config.xochitl}
-          rmset RM_VPSRPORT ${toString config.vpsrport}
-          ${config.extraConfig ? ""}
+          rmset RM_SSH ${C.ssh}
+          rmset RM_VPSSSH ${C.vpsssh}
+          rmset RM_XOCHITL ${C.xochitl}
+          rmset RM_VPSRPORT ${toString C.vpsrport}
+          ${C.extraConfig}
           EOF
 
-          put ${./sh}/install-sshR.sh
-          put ${./sh}/rmcommon
-          put ${./sh}/rmadd
-          put ${./sh}/rmfind
-          put ${./sh}/rmls
-          put ${./sh}/rmpull
-          put ${./sh}/rmpush
-          put ${./sh}/rmssh
+          putsh ${./sh}/install-sshR.sh
+          putsh ${./sh}/rmcommon
+          putsh ${./sh}/rmadd
+          putsh ${./sh}/rmfind
+          putsh ${./sh}/rmls
+          putsh ${./sh}/rmpull
+          putsh ${./sh}/rmpush
+          putsh ${./sh}/rmssh
 
           putbash ${./sh}/rmadd1
-          wrapProgram $out/bin/rmadd1 \
-            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                imagemagick yad])}
-
           putbash ${./3rdparty/fraga}/rmconvert.sh
           substituteInPlace $out/bin/rmconvert \
             --replace "\''${software}/getpageuuids.awk" ${./3rdparty/fraga/getpageuuids.awk}
-          wrapProgram $out/bin/rmconvert \
-            --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                python3 inkscape xpdf pdftk ghostscript poppler_utils])}
         '';
-      };
+      });
 
       rmsynctools_def = rmsynctools rmsynctools_defconfig;
 
