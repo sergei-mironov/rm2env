@@ -33,4 +33,7 @@ fi
 
 CACHE=/tmp/rmget_$UID.txt
 rmls | grep -v /trash/ >$CACHE
-bash $(dirname $0)/rmconvert $(rmfind "$CACHE" "$INPUT") "$OUTPUT"
+UUID=$(rmfind "$CACHE" "$INPUT")
+test -z "$UUID" && rmdie "File \"$F.pdf\" does not have UUID"
+bash $(dirname $0)/rmconvert "$UUID" "$OUTPUT" ||
+  rmdie "Abnormal termination"

@@ -29,9 +29,9 @@
 
 # ------------------------------------------------ usage and arguments
 # check usage and remember uuid argument
-if [ $# -lt 1 ]; then
+if [ $# -lt 2 ]; then
     echo "Convert reMarkable document to PDF"
-    echo "usage: $(basename $0) uuid"
+    echo "usage: $(basename $0) UUID OUTPUT"
     exit 1
 fi
 
@@ -70,7 +70,7 @@ trap "killprogress "$tmp" ; rm -rf ${tmp}" 0 1 2 3 9
 # taking into account if the original PDF was rotated.
 
 doc=${uuid}.pdf
-if [ -f ${doc} ]
+if [ -f "${doc}" ]
 then
     echo : PDF file exists
     # figure out desired size of SVG image
@@ -121,7 +121,7 @@ numberofpages=$(grep pageCount ${content} | sed -e 's/[^0-9]//g')
 # echo "$numberofpages pages with width $width and height $height "
 
 # get array of uuids for pages in document
-awk -f $(dirname $0)/getpageuuids.awk ${content} > ${tmp}/pageuuids
+awk -f "$(dirname $0)/getpageuuids.awk" ${content} > ${tmp}/pageuuids
 readarray -t pageuuids < ${tmp}/pageuuids
 rm ${tmp}/pageuuids
 

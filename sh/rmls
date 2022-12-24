@@ -65,7 +65,7 @@ N=$(find ${xochitl} -name '*.metadata' | wc -l)
 i=0
 for metadata in $(find ${xochitl} -name '*.metadata')
 do
-    uuid=$(basename ${metadata} .metadata)
+    uuid=$(basename "${metadata}" .metadata)
     # check to see if this is a file or a directory (Collection)
     type=$(grep type ${metadata} | sed -e 's/^.*": "//' -e 's/",.*$//' )
     # echo 'Checking type of file: ' ${metadata} 'is of type' ${type}
