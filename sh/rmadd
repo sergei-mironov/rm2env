@@ -2,7 +2,24 @@
 
 . $(dirname $0)/rmcommon
 
-set -e -x
+flist=$(mktemp --tmpdir)
+trap "rm $flist" 0 1 2 3 9
+while test -n "$1" ; do
+  case "$1" in
+    --gui) RM_GUI=y;;
+    --no-gui) RM_GUI=n;;
+    -v|--verbose) RM_VERBOSE=y;;
+    --dry-run) RM_DRYRUN='--dry-run';;
+    *) echo "$1" >> $flist;;
+  esac
+  shift
+done
+
+if test "$RM_VERBOSE" != "n" ; then
+  set -x
+fi
+
+set -e
 
 CACHE=/tmp/rmfind_$UID.txt
 LOG=/tmp/rmadd_$UID.txt
@@ -10,13 +27,15 @@ rmls >$CACHE
 
 N=0
 OK=0
+IFS=$'\n'
 echo >$LOG
-for pdf in "$@" ; do
+for pdf in $(cat $flist) ; do
   if test -f "$pdf" ; then
     UUID=$(rmfind "$CACHE" "$pdf")
     if test -z "$UUID" ; then
-      if bash $(dirname $0)/rmadd1 "$pdf" ; then
+      if bash $(dirname $0)/rmadd1 "$pdf" >> $LOG ; then
         OK=$(expr $OK '+' 1)
+        echo "File '$pdf': OK" | tee -a $LOG
       fi
     else
       echo "File '$pdf' already exists on RM2 as $UUID" | tee -a $LOG
@@ -31,8 +50,7 @@ if test "$OK" = "$N" ; then
   rmpush
 else
   echo "$(expr $N - $OK) errors found. Run rmpush explicitly" | tee -a $LOG
-  rmwarn "$(cat $LOG)"
-  exit 1
+  rmdieL "$LOG"
 fi
 
 

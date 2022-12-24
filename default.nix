@@ -327,6 +327,9 @@ let
         vpsssh = "vps";
         vpsrport = 4349;
         xochitl = "\\$HOME/.xochitl";
+        extraConfig = ''
+          rmset RM_GUIARGS "--width=800 --icon=${./remarkable.ico}"
+        '';
       };
 
       rmsynctools = config : pkgs.stdenv.mkDerivation {
@@ -349,6 +352,7 @@ let
           rmset RM_VPSSSH ${config.vpsssh}
           rmset RM_XOCHITL ${config.xochitl}
           rmset RM_VPSRPORT ${toString config.vpsrport}
+          ${config.extraConfig ? ""}
           EOF
 
           put ${./sh}/install-sshR.sh
@@ -363,7 +367,7 @@ let
           putbash ${./sh}/rmadd1
           wrapProgram $out/bin/rmadd1 \
             --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                imagemagick])}
+                imagemagick yad])}
 
           putbash ${./3rdparty/fraga}/rmconvert.sh
           substituteInPlace $out/bin/rmconvert \
@@ -392,6 +396,8 @@ let
           pkgs.pdftk
           pkgs.ghostscript
           pkgs.poppler_utils
+          pkgs.gnome.zenity
+          pkgs.yad
         ];
       shellHook = with pkgs; ''
         export PATH=`pwd`/sh:`pwd`/3rdparty/remarkable-cli-tooling:`pwd`/3rdparty/rMsync:$PATH

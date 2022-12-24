@@ -2,31 +2,41 @@
 
 . $(dirname $0)/rmcommon
 
-dr() {
-  if test -z "$DRYRUN" ; then
-    "$@"
-  else
-    echo "$@"
-  fi
-}
-
-DRYRUN=''
 while test -n "$1" ; do
   case "$1" in
-    --dry-run) DRYRUN='--dry-run' ;;
+    --dry-run) RM_DRYRUN='--dry-run' ;;
+    -v|--verbos) RM_VERBOSE=y ;;
   esac
   shift
 done
+
+RSYNC_VERBOSE=""
+if test "$RM_VERBOSE" = "y" ; then
+  RSYNC_VERBOSE="-v"
+  set -x
+fi
 
 set -e
 
 rmcheck
 
+T=$(mktemp -d --tmpdir)
+mkprogress "$T" "Checking the connection"
+trap "killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
 while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
-  rmecho -n .
+  echoprogress "$T" "Checking the connection"
   sleep 1
 done
+killprogress "$T"
 
-rsync -i -avP $DRYRUN -e "rmssh" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/"
-rsync -i -avP $DRYRUN --no-owner --no-group -e "rmssh" "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/"
-dr rmssh "$RM_SSH" systemctl restart xochitl
+mkprogress "$T" "Fetching from Remarkable"
+rsync --out-format='#Receiving:%n%L' $RSYNC_VERBOSE -i -aP $RM_DRYRUN -e "rmssh" \
+  "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" >&$RM_PF
+killprogress "$T"
+
+mkprogress "$T" "Pushing to Remarkable"
+rsync --out-format='#Sending:%n%L' $RSYNC_VERBOSE -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
+  "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" >&$RM_PF
+killprogress "$T"
+
+rmdr rmssh "$RM_SSH" systemctl restart xochitl

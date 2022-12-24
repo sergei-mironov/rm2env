@@ -2,18 +2,17 @@
 
 . $(dirname $0)/rmcommon
 
-DRYRUN=''
 while test -n "$1" ; do
   case "$1" in
-    --dry-run) DRYRUN='--dry-run' ;;
+    --dry-run) RM_DRYRUN='--dry-run' ;;
   esac
   shift
 done
 
 set -e -x
 
-mkdir "$RM_XOCHITL" || true
+mkdir "$RM_XOCHITL" 2>/dev/null || true
 if ! test -d "$RM_XOCHITL" ; then
   rmdie "RM_XOCHITL($RM_XOCHITL) is not a directory"
 fi
-rsync -i -avP $DRYRUN --delete -e "rmssh" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/"
+rsync -i -avP $RM_DRYRUN --delete -e "rmssh" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/"

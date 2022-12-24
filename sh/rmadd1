@@ -19,17 +19,15 @@ n=$(pdfinfo "${pdf}" | grep '^Pages' | awk '{print $2}')
 name=$(basename "${pdf}" .pdf)
 date="$(date +%s)000"
 echo Uploading PDF document ${name} with ${n} pages, date ${date}
-temp=$(mktemp --directory rm.XXXXX)
-trap "rm -rf $temp" 0 1 2 3 9
-echo Resulting documents in ${temp}
-
+T=$(mktemp --tmpdir --directory "rmadd1.XXXXX")
+mkprogress "$T" "Adding file"
+trap "echo Cleanup; killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
 uuid=$(uuidgen)
 echo Creating $uuid document directories.
-dest=${temp}/${uuid}
-mkdir ${dest}
-mkdir ${dest}.{cache,highlights,textconversion,thumbnails}
-cp "${pdf}" ${dest}.pdf
-
+out="$T/out"
+dest=${out}/${uuid}
+mkdir -pv ${dest}.{cache,highlights,textconversion,thumbnails}
+cp -pv "${pdf}" ${dest}.pdf
 cat > ${dest}.content <<EOF
 {
     "extraMetadata": {
@@ -52,7 +50,7 @@ while [ ${page} -le ${n} ]; do
   else
     echo '        "'${pageuuid}'"' >> ${dest}.content
   fi
-  ((page++))
+  page=$(expr $page '+' 1)
 done
 cat >> ${dest}.content <<EOF
 ],
@@ -92,15 +90,21 @@ page=1
 touch ${dest}.pagedata
 while [ ${page} -le ${n} ]; do
   echo Blank >> ${dest}.pagedata
-  ((page++))
+  page=$(expr $page '+' 1)
 done
 
 pdfseparate "${pdf}" ${dest}.thumbnails/%d.pdf
 page=0
 while [ ${page} -lt ${n} ]; do
+  echoprogress "$T" $(awk "BEGIN{print ($page/$n)*100}") "Generating thumbnails"
   convert ${dest}.thumbnails/$((page+1)).pdf -monochrome -scale 362x512 ${dest}.thumbnails/${page}.jpg
   rm ${dest}.thumbnails/$((page+1)).pdf
-  ((page++))
+  page=$(expr $page '+' 1)
 done
 
-( cd ${temp} ; tar cf - . | (cd "$RM_XOCHITL" ; tar xvf - ))
+if test -n "$RM_DRYRUN" ; then
+  echo "dry-run: COPYING $out to $RM_XOCHITL"
+else
+  ( cd "${out}" ; tar cf - . | (cd "$RM_XOCHITL" ; tar xvf - ))
+fi
+
