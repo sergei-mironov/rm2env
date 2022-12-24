@@ -8,11 +8,11 @@ if ! test -f "$F" ; then
   rmdie "File ($F) not found"
 fi
 
-set -e -x
+set -e
 
 rmcheck
 
-set +e -x
+set +e
 
 pdf="$F"
 n=$(pdfinfo "${pdf}" | grep '^Pages' | awk '{print $2}')

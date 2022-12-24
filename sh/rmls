@@ -56,7 +56,13 @@ function getfullname {
 # getfullname:1 ends here
 
 # [[file:index.org::*main block][main block:1]]
+T=$(mktemp --tmpdir --directory "rmadd1.XXXXX")
+trap "echo Cleanup; killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
+mkprogress "$T" "Listing files"
+
 xochitl="$RM_XOCHITL"
+N=$(find ${xochitl} -name '*.metadata' | wc -l)
+i=0
 for metadata in $(find ${xochitl} -name '*.metadata')
 do
     uuid=$(basename ${metadata} .metadata)
@@ -70,5 +76,7 @@ do
         date=$(date --date="@${lastchange}" +%Y%m%d-%H:%M:%S)
         echo ${uuid} ${date} ${fullname}
     fi
+    i=$(expr $i '+' 1)
+    echoprogress "$T" "$i"
 done
 # main block:1 ends here

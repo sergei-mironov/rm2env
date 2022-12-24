@@ -33,8 +33,9 @@ while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
 done
 killprogress "$T"
 
-mkprogress "$T" "Fetching from Remarkable" "--pulsate"
-rsync $RSYNC_VERBOSE --out-format='#Receiving:%n%L' \
+mkprogress "$T" "Pulling from Remarkable" "--pulsate"
+echoprogress "$T" 0 "Pulling..."
+rsync $RSYNC_VERBOSE --out-format='#Pulling: %n%L' \
   -i -aP $RM_DRYRUN --delete -e "rmssh" \
   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
   echoprogress "$T"

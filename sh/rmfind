@@ -19,14 +19,14 @@ while test -n "$1" ; do
 done
 
 set -e -x
+test -f "$F"
+
+rmcheck
 
 if ! test -f "$CACHE" ; then
   CACHE=/tmp/rmfind_$UID.txt
+  rmls >$CACHE
 fi
-
-test -f "$F"
-rmcheck
-rmls >$CACHE
 
 FN=$(basename "$F" .pdf)
 grep --fixed-strings "$FN" "$CACHE" | awk '{print $1}'
