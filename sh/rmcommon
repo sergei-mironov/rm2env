@@ -24,9 +24,6 @@ rmdie() {
 rmdieL() {
   if test "$RM_GUI" = "y" ; then
     (IFS=' '; yad --text-info --filename="$1" --button 'OK!gtk-ok' $RM_GUIARGS ;)
-    cat "$1" >&2
-  else
-    cat "$1" >&2
   fi
   exit 1
 }
@@ -51,7 +48,7 @@ mkprogress() {
   d="$1"
   title="$2"
   test -d "$d" || return 1
-  rm "$d/fifo" || true
+  rm "$d/fifo" 2>/dev/null || true
   mkfifo "$d/fifo"
   (IFS=' '; yad $RM_GUIARGS --progress --title="$title" "$3" < "$d/fifo" &
     echo "$!" > "$d/yad.pid"
@@ -66,17 +63,35 @@ killprogress() {
   test "$RM_GUI" = "y" || return 0
   d="$1"
   test -d "$d" || return 1
-  rm "$d/fifo" || true
+  rm "$d/fifo" 2>/dev/null || true
   exec 5>&- || true
-  kill $(cat "$d/yad.pid")
+  kill $(cat "$d/yad.pid") 2>/dev/null
 }
 
-echoprogress() {
+echoprogress() {(
   # Update the progressbar
+  set +x
   test "$RM_GUI" = "y" || return 0
-  echo "$2" >&5
-  echo "#$3" >&5
-}
+  shift # T is not used
+  READINP=y
+  while test -n "$1" ; do
+    if test "$1" -ge 0 >/dev/null 2>&1; then
+      echo "$1" >&5
+    else
+      echo "#$1" >&5
+    fi
+    READINP=n
+    shift
+  done
+  if test "$READINP" = "y" ; then
+    while read L ; do
+      case $L in
+        [0-9]*|\#*) echo $L >&5 ;;
+      esac
+      echo $L
+    done
+  fi
+)}
 
 RM_NOUSER="<INVALID_USER>"
 RM_NOIP="<INVALID_IP>"

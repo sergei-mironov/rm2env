@@ -5,14 +5,44 @@
 while test -n "$1" ; do
   case "$1" in
     --dry-run) RM_DRYRUN='--dry-run' ;;
+    -v|--verbose) RM_VERBOSE=y ;;
   esac
   shift
 done
 
-set -e -x
-
-mkdir "$RM_XOCHITL" 2>/dev/null || true
-if ! test -d "$RM_XOCHITL" ; then
-  rmdie "RM_XOCHITL($RM_XOCHITL) is not a directory"
+RSYNC_VERBOSE=""
+if test "$RM_VERBOSE" = "y" ; then
+  RSYNC_VERBOSE="-v"
+  set -x
 fi
-rsync -i -avP $RM_DRYRUN --delete -e "rmssh" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/"
+
+set -e
+
+rmcheck
+
+T=$(mktemp -d --tmpdir)
+LOG=$T/rmpull_$UID.txt
+trap "killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
+
+{
+mkprogress "$T" "Checking the connection" "--pulsate"
+echoprogress "$T" 0 "Checking the connection"
+while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
+  echoprogress "$T" 100 "Checking the connection"
+  sleep 0.1
+done
+killprogress "$T"
+
+mkprogress "$T" "Fetching from Remarkable" "--pulsate"
+rsync $RSYNC_VERBOSE --out-format='#Receiving:%n%L' \
+  -i -aP $RM_DRYRUN --delete -e "rmssh" \
+  "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
+  echoprogress "$T"
+killprogress "$T"
+echo y >$T/OK
+} 2>&1 | tee -a "$LOG"
+
+if ! grep -q -s y "$T/OK" ; then
+  rmdieL "$LOG"
+fi
+
