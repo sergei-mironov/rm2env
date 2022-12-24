@@ -23,7 +23,7 @@ set -e
 
 CACHE=/tmp/rmfind_$UID.txt
 LOG=/tmp/rmadd_$UID.txt
-rmls >$CACHE
+rmls | grep -v /trash/ >$CACHE
 
 N=0
 OK=0

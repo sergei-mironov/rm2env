@@ -71,23 +71,33 @@ killprogress() {
 echoprogress() {(
   # Update the progressbar
   set +x
-  test "$RM_GUI" = "y" || return 0
+  # test "$RM_GUI" = "y" || return 0
   shift # T is not used
   READINP=y
+  ADDNUMBERS=n
   while test -n "$1" ; do
     case "$1" in
-      [0-9]*|\#*) echo "$1" >&5 ;;
-      *) echo "#$1" >&5 ;;
+      --add-numbers) ADDNUMBERS=y ;;
+      [0-9]*|\#*) echo "$1" >&$RM_PF ; echo "$1"; READINP=n;;
+      -) READINP=y ;;
+      *) echo "#$1" >&$RM_PF; echo "$1"; READINP=n ;;
     esac
     shift
-    READINP=n
   done
   if test "$READINP" = "y" ; then
+    i=0
     while read L ; do
       case $L in
-        [0-9]*|\#*) echo $L >&5 ;;
+        [0-9]*) echo $L >&$RM_PF ;;
+        \#*)
+          if test "$ADDNUMBERS" = "y"; then
+            echo $i >&$RM_PF
+          fi
+          echo $L >&$RM_PF
+        ;;
       esac
       echo $L
+      i=$(expr $i '+' 1)
     done
   fi
 )}

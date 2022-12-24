@@ -4,6 +4,8 @@
 
 while test -n "$1" ; do
   case "$1" in
+    --gui) RM_GUI=y ;;
+    --no-gui) RM_GUI=n ;;
     --dry-run) RM_DRYRUN='--dry-run' ;;
     -v|--verbose) RM_VERBOSE=y ;;
   esac
@@ -38,7 +40,7 @@ echoprogress "$T" 0 "Pulling..."
 rsync --out-format='#Pulling: %n%L' $RSYNC_VERBOSE \
   -i -aP $RM_DRYRUN -e "rmssh" \
   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
-  echoprogress "$T"
+  echoprogress "$T" --add-numbers
 killprogress "$T"
 
 mkprogress "$T" "Pushing to Remarkable" "--pulsate"
@@ -46,10 +48,11 @@ echoprogress "$T" 0 "Pushing..."
 rsync --out-format='#Pushing: %n%L ' $RSYNC_VERBOSE \
   -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
   "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" | \
-  echoprogress "$T"
-killprogress "$T"
+  echoprogress "$T" --add-numbers
 
+echoprogress "$T" "Restarting Remarkable GUI"
 rmdr rmssh "$RM_SSH" systemctl restart xochitl
+killprogress "$T"
 echo y > $T/OK
 } 2>&1 | tee -a "$LOG"
 
