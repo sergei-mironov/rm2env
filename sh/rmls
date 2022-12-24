@@ -57,7 +57,7 @@ function getfullname {
 
 # [[file:index.org::*main block][main block:1]]
 T=$(mktemp --tmpdir --directory "rmadd1.XXXXX")
-trap "echo Cleanup; killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
+trap "killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
 mkprogress "$T" "Listing files"
 
 xochitl="$RM_XOCHITL"
@@ -76,7 +76,8 @@ do
         date=$(date --date="@${lastchange}" +%Y%m%d-%H:%M:%S)
         echo ${uuid} ${date} ${fullname}
     fi
+    percent=$(awk "BEGIN{print ($i/${N})*100}")
+    echoprogress "$T" -S "$percent"
     i=$(expr $i '+' 1)
-    echoprogress "$T" "$i"
 done
 # main block:1 ends here

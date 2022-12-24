@@ -75,10 +75,21 @@ echoprogress() {(
   shift # T is not used
   READINP=y
   ADDNUMBERS=n
+  SILENTNUMBERS=n
   while test -n "$1" ; do
     case "$1" in
       --add-numbers) ADDNUMBERS=y ;;
-      [0-9]*|\#*) echo "$1" >&$RM_PF ; echo "$1"; READINP=n;;
+      -S|--silent-numbers) SILENTNUMBERS=y ;;
+      [0-9]*)
+        test "$RM_PF" != "1" && echo "$1" >&$RM_PF
+        test "$SILENTNUMBERS" = "n" && echo "$1"
+        READINP=n
+        ;;
+      \#*)
+        test "$RM_PF" != "1" && echo "$1" >&$RM_PF
+        echo "$1"
+        READINP=n
+        ;;
       -) READINP=y ;;
       *) echo "#$1" >&$RM_PF; echo "$1"; READINP=n ;;
     esac
@@ -88,15 +99,19 @@ echoprogress() {(
     i=0
     while read L ; do
       case $L in
-        [0-9]*) echo $L >&$RM_PF ;;
+        [0-9]*)
+          test "$RM_PF" != "1" && echo $L >&$RM_PF
+          test "$SILENTNUMBERS" = "n" && echo $L
+          ;;
         \#*)
           if test "$ADDNUMBERS" = "y"; then
-            echo $i >&$RM_PF
+            test "$RM_PF" != "1" && echo $i >&$RM_PF
           fi
-          echo $L >&$RM_PF
-        ;;
+          test "$RM_PF" != "1" && echo $L >&$RM_PF
+          echo $L
+          ;;
+        *) echo $L ;;
       esac
-      echo $L
       i=$(expr $i '+' 1)
     done
   fi

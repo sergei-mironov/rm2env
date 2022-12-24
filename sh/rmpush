@@ -28,15 +28,15 @@ trap "killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
 
 {
 mkprogress "$T" "Checking the connection" "--pulsate"
-echoprogress "$T" 0 "Checking the connection"
+echoprogress "$T" -S 0 "Checking the connection"
 while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
-  echoprogress "$T" 100 "Checking the connection"
+  echoprogress "$T" -S 100 "Checking the connection"
   sleep 0.1
 done
 killprogress "$T"
 
 mkprogress "$T" "Pulling from Remarkable" "--pulsate"
-echoprogress "$T" 0 "Pulling..."
+echoprogress "$T" -S 0 "Pulling..."
 rsync --out-format='#Pulling: %n%L' $RSYNC_VERBOSE \
   -i -aP $RM_DRYRUN -e "rmssh" \
   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
@@ -44,7 +44,7 @@ rsync --out-format='#Pulling: %n%L' $RSYNC_VERBOSE \
 killprogress "$T"
 
 mkprogress "$T" "Pushing to Remarkable" "--pulsate"
-echoprogress "$T" 0 "Pushing..."
+echoprogress "$T" -S 0 "Pushing..."
 rsync --out-format='#Pushing: %n%L ' $RSYNC_VERBOSE \
   -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
   "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" | \

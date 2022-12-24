@@ -27,11 +27,10 @@ if test -z "$OUTPUT" ; then
   F=$(basename "$INPUT" .pdf)
   OUTPUT="$D/$F #$RM_AMARKER.pdf"
 fi
-if test -f "$OUTPUT"; then
-  rmdie "Annotated output '$OUTPUT' already exists"
-fi
+# if test -f "$OUTPUT"; then
+#   rmdie "Annotated output '$OUTPUT' already exists"
+# fi
 
 CACHE=/tmp/rmget_$UID.txt
 rmls | grep -v /trash/ >$CACHE
-
 bash $(dirname $0)/rmconvert $(rmfind "$CACHE" "$INPUT") "$OUTPUT"

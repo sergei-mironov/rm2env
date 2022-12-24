@@ -37,6 +37,10 @@ fi
 
 . $(dirname $0)/rmcommon
 
+if test "$RM_VERBOSE" = "y" ; then
+  set -x
+fi
+
 rmcheck
 
 cd "$RM_XOCHITL"
@@ -58,7 +62,7 @@ templatesdir="${HOME}/synced/remarkable/templates"
 # where to store intermediate files
 tmp=$(mktemp -d /tmp/remarkable.XXXXXX)
 # echo "Temporary directory: ${tmp}"
-
+trap "killprogress "$tmp" ; rm -rf ${tmp}" 0 1 2 3 9
 # ------------------------------------------------ get document geometry
 #
 # if there is a PDF document, we use this document to specify the
@@ -70,8 +74,8 @@ if [ -f ${doc} ]
 then
     echo : PDF file exists
     # figure out desired size of SVG image
-    width=$(pdfinfo ${doc} | grep 'Page size:' | awk '{print $3}' | sed -e 's/\..*//')
-    height=$(pdfinfo ${doc} | grep 'Page size:' | awk '{print $5}' | sed -e 's/\..*//')
+    width=$(pdfinfo -l 10 ${doc} | grep 'Page *[0-9]* size:' | tail -n 1 | awk '{print $4}' | sed -e 's/\..*//')
+    height=$(pdfinfo -l 10 ${doc} | grep 'Page *[0-9]* size:' | tail -n 1 | awk '{print $6}' | sed -e 's/\..*//')
     numberofpdfpages=$(pdfinfo ${doc} | grep 'Pages:' | awk '{print $2}')
     usetemplates="no"
     # echo "width is $width and height is $height"
@@ -88,7 +92,18 @@ then
     fi
     # extract all the pages from the PDF document into the base
     # directory, but only if that directory exists
+    mkprogress "$tmp" "Separating pages"
+    (while true; do
+      page=$(ls ${tmp}/original-*.pdf | wc -l)
+      percent=$(awk "BEGIN{print ($page/${numberofpdfpages})*100}")
+      echoprogress "$tmp" -S "$percent" "Separated $page of $numberofpdfpages pages"
+      sleep 1
+    done
+    )&
+    pid=$!
     pdfseparate ${doc} ${tmp}/original-%d.pdf >/dev/null 2>/dev/null
+    kill $pid
+    killprogress "$tmp"
 else
     # assume default geometry
     # echo ${doc} does not exist so direct conversion of lines files
@@ -115,6 +130,7 @@ rm ${tmp}/pageuuids
 # convert each page to an SVG image and then to a PDF version.  These
 # PDF pages will be left in ${tmp}/N.pdf
 
+mkprogress "${tmp}" "Creating overlay pages"
 for page in $(seq 1 ${numberofpages})
 do
     # echo -e -n "processing ${uuid} page ${page} with uuid ${pageuuids[$page]}      \r" 
@@ -177,26 +193,38 @@ do
         fi
         rm ${tmp}/${page}.svg
     fi
+    percent=$(awk "BEGIN{print ($page/${numberofpages})*100}")
+    echoprogress "$tmp" -S "$percent" \
+      "Preprocessing page ${page} of ${numberofpages}" \
+      || exit 1
 done
+killprogress "$tmp"
 echo ''
 
 # ------------------------------------------------ overlay on PDF
 #
+mkprogress "${tmp}" "Overlaying pages"
 if [ -f ${doc} ]
 then
     for page in $(seq 1 ${numberofpdfpages})
     do
+        percent=$(awk "BEGIN{print ($page/${numberofpdfpages})*100}")
+        echoprogress "$tmp" -S "$percent" || exit 1
+
         if [ -f ${tmp}/original-${page}.pdf ]
         then
             if [ -f ${tmp}/${page}.pdf ]
             then
-                echo "Overlaying page ${page} with annotations "
+                echoprogress "$tmp" \
+                  "Overlaying page ${page} with annotations" || exit 1
                 cp ${tmp}/${page}.pdf tmp.pdf
                 pdftk tmp.pdf background ${tmp}/original-${page}.pdf \
                       output ${tmp}/${page}-tmp.pdf
                 rm tmp.pdf
                 rm ${tmp}/original-${page}.pdf
             else
+                echoprogress "$tmp" \
+                  "Keeping page ${page}" || exit 1
                 mv ${tmp}/original-${page}.pdf ${tmp}/${page}-tmp.pdf
             fi
             # use ghostscript to compress the resulting PDF,
@@ -213,14 +241,13 @@ then
 fi
 
 # finally bring all the pages together
+echoprogress "$tmp" "Combining pages" || exit 1
 pdfunite $(ls -1v ${tmp}/*.pdf) /tmp/${uuid}_annotated.pdf >/dev/null 2>/dev/null
+killprogress "$tmp"
 
 if test "$RM_DRYRUN" = "y" ; then
   echo mv "/tmp/${uuid}_annotated.pdf" "$output"
 else
   mv "/tmp/${uuid}_annotated.pdf" "$output"
 fi
-
-# delete the temporary directory
-rm -rf ${tmp}
 
