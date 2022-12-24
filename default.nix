@@ -377,6 +377,7 @@ let
           putsh ${./sh}/rmpull
           putsh ${./sh}/rmpush
           putsh ${./sh}/rmssh
+          putsh ${./sh}/rmget
 
           putbash ${./sh}/rmadd1
           putbash ${./sh}/rmconvert
