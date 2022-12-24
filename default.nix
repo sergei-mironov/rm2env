@@ -327,7 +327,9 @@ let
         vpsssh = "vps";
         vpsrport = 4349;
         xochitl = "\\$HOME/.xochitl";
-        guiargs = "--width=800 --icon=${./remarkable.ico} --title='Remarkable sync'";
+        extraConfig = ''
+          RM_GUIARGS="--width=800 --window-icon=${./remarkable.ico} --title=RemarkablSync"
+        '';
       };
 
       rmsynctools = config : pkgs.stdenv.mkDerivation (
@@ -364,7 +366,6 @@ let
           rmset RM_VPSSSH ${C.vpsssh}
           rmset RM_XOCHITL ${C.xochitl}
           rmset RM_VPSRPORT ${toString C.vpsrport}
-          rmset RM_GUIARGS "${C.guiargs}"
           ${C.extraConfig}
           EOF
 

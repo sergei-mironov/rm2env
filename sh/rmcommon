@@ -16,14 +16,14 @@ rmwarn() {
 rmdie() {
   echo "$@" >&2
   if test "$RM_GUI" = "y" ; then
-    yad $RM_GUIARGS --text "$@" --button 'OK!gtk-ok'
+    (IFS=' '; yad $RM_GUIARGS --text "$@" --button 'OK!gtk-ok';)
   fi
   exit 1
 }
 
 rmdieL() {
   if test "$RM_GUI" = "y" ; then
-    yad $RM_GUIARGS --text-info --filename="$1" --button 'OK!gtk-ok'
+    (IFS=' '; yad --text-info --filename="$1" --button 'OK!gtk-ok' $RM_GUIARGS ;)
     cat "$1" >&2
   else
     cat "$1" >&2
@@ -53,7 +53,7 @@ mkprogress() {
   test -d "$d" || return 1
   rm "$d/fifo" || true
   mkfifo "$d/fifo"
-  yad $RM_GUIARGS --progress --pulsate --title="$title" < "$d/fifo" &
+  (IFS=' '; yad $RM_GUIARGS --progress --pulsate --title="$title" < "$d/fifo";) &
   echo "$!" > "$d/yad.pid"
   exec 5>"$d/fifo"
   RM_PF="5"
@@ -99,4 +99,3 @@ rmset RM_VPSRPORT "$RM_NOPORT"
 rmset RM_VPSIP "$RM_NOIP" # Optional
 rmset RM_VPSUSER "$RM_NOUSER" # Optional
 rmset RM_VPSPORT "$RM_NOPORT" # Optional
-
