@@ -379,9 +379,7 @@ let
           putsh ${./sh}/rmssh
 
           putbash ${./sh}/rmadd1
-          putbash ${./3rdparty/fraga}/rmconvert.sh
-          substituteInPlace $out/bin/rmconvert \
-            --replace "\''${software}/getpageuuids.awk" ${./3rdparty/fraga/getpageuuids.awk}
+          putbash ${./sh}/rmconvert
         '';
       });
 

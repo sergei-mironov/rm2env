@@ -6,11 +6,18 @@ if test "$RM_VERBOSE" = "y" ; then
   set -x
 fi
 
+if test "$1" = "--no-timeout" ; then
+  NCTO=''
+  shift
+else
+  NCTO='-w 5'
+fi
+
 if test -n "$RM_VPSSSH" ; then
   if test "$RM_VPSRPORT" = "$RM_NOPORT" ; then
     rmdie "RM_VPSSSH is set, but RM_VPSRPORT does not"
   fi
-  exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc -w 5 127.0.0.1 $RM_VPSRPORT" "$@"
+  exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $RM_VPSRPORT" "$@"
 else
   exec ssh "$@"
 fi

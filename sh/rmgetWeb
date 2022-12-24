@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+. $(dirname $0)/rmcommon
+
+INPUT=''
+OUTPUT=''
+while test -n "$1" ; do
+  case "$1" in
+    --gui) RM_GUI=y ;;
+    --no-gui) RM_GUI=n ;;
+    --dry-run) RM_DRYRUN=y;;
+    -v|--verbose) RM_VERBOSE=y ;;
+    -o) OUTPUT=$2; shift ;;
+    *) INPUT="$1" ;;
+  esac
+  shift
+done
+
+set -e
+if test "$RM_VERBOSE" = "y" ; then
+  set -x
+fi
+rmcheck
+test -f "$INPUT"
+if test -z "$OUTPUT" ; then
+  D=$(dirname "$INPUT")
+  F=$(basename "$INPUT" .pdf)
+  OUTPUT="$D/$F #${RM_AMARKER}2.pdf"
+fi
+if test -f "$OUTPUT"; then
+  rmdie "Annotated output '$OUTPUT' already exists"
+fi
+
+CACHE=/tmp/rmget_$UID.txt
+rmls | grep -v /trash/ >$CACHE
+
+UUID=$(rmfind "$CACHE" "$INPUT")
+rmssh --no-timeout -o "ConnectTimeout=3" $RM_SSH \
+  wget -q -S -O - "http://10.11.99.1/download/${UUID}/placeholder" >_out.pdf
+mv _out.pdf "$OUTPUT"
+echo "Saved as $OUTPUT"

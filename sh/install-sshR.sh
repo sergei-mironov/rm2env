@@ -27,6 +27,9 @@ if test "$RM_VPSPORT" = "$RM_NOPORT"; then
   fi
   rmwarn "Deduced RM_VPPORT is '$RM_VPSPORT'"
 fi
+if test "$RM_VPSRPORT" = "$RM_NOPORT"; then
+  rmdie "RM_VPSRPORT is not set"
+fi
 
 ssh $RM_SSH mkdir .ssh || true
 ssh $RM_SSH rm .ssh/id_dropbear || true

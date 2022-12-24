@@ -114,6 +114,7 @@ fi
 rmset RM_GUI "y"
 rmset RM_VERBOSE "n"
 rmset RM_DRYRUN ""
+rmset RM_AMARKER "annot"
 
 rmset RM_GUIARGS ""
 rmset RM_XOCHITL $HOME/.xochitl

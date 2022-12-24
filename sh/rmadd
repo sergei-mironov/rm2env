@@ -31,14 +31,18 @@ IFS=$'\n'
 echo >$LOG
 for pdf in $(cat $flist) ; do
   if test -f "$pdf" ; then
-    UUID=$(rmfind "$CACHE" "$pdf")
-    if test -z "$UUID" ; then
-      if bash $(dirname $0)/rmadd1 "$pdf" >> $LOG ; then
-        OK=$(expr $OK '+' 1)
-        echo "File '$pdf': OK" | tee -a $LOG
-      fi
+    if echo "$pdf" | grep -s -q "#$RM_AMARKER" ; then
+      echo "File '$pdf' is already marked as annotaded" | tee -a $LOG
     else
-      echo "File '$pdf' already exists on RM2 as $UUID" | tee -a $LOG
+      UUID=$(rmfind "$CACHE" "$pdf")
+      if test -z "$UUID" ; then
+        if bash $(dirname $0)/rmadd1 "$pdf" >> $LOG ; then
+          OK=$(expr $OK '+' 1)
+          echo "File '$pdf': OK" | tee -a $LOG
+        fi
+      else
+        echo "File '$pdf' already exists on RM2 as $UUID" | tee -a $LOG
+      fi
     fi
   else
     echo "File '$pdf' does not exist" | tee -a $LOG
