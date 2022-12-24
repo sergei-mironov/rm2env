@@ -75,13 +75,12 @@ echoprogress() {(
   shift # T is not used
   READINP=y
   while test -n "$1" ; do
-    if test "$1" -ge 0 >/dev/null 2>&1; then
-      echo "$1" >&5
-    else
-      echo "#$1" >&5
-    fi
-    READINP=n
+    case "$1" in
+      [0-9]*|\#*) echo "$1" >&5 ;;
+      *) echo "#$1" >&5 ;;
+    esac
     shift
+    READINP=n
   done
   if test "$READINP" = "y" ; then
     while read L ; do

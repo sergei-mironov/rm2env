@@ -96,7 +96,8 @@ done
 pdfseparate "${pdf}" ${dest}.thumbnails/%d.pdf
 page=0
 while [ ${page} -lt ${n} ]; do
-  echoprogress "$T" $(awk "BEGIN{print ($page/$n)*100}") "Generating thumbnails"
+  p=$(awk "BEGIN{print ($page/$n)*100}")
+  echoprogress "$T" "$p" "Generating thumbnails page $page of $n"  || exit 1
   convert ${dest}.thumbnails/$((page+1)).pdf -monochrome -scale 362x512 ${dest}.thumbnails/${page}.jpg
   rm ${dest}.thumbnails/$((page+1)).pdf
   page=$(expr $page '+' 1)
