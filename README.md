@@ -53,16 +53,17 @@ $ nix build '.#rmsynctools_def' --impure
 ### Establishing wireless SSH connection
 
 To enable SSH access to the Remarkable tablet I rely on a third-party server
-with a public IP address. I use [install-sshR](./sh/install-sshR.sh) to setup a
+with a public IP address. We use [install-sshR](./sh/install-sshR.sh) to setup a
 Systemd service on the device and to send necessary SSH keys to the server. The
 service then maintains a connection to the server which keeps certain ports open
 and pointing back to the device.
 
 ### Accessing Remarkable PDFs from Host
 
-This repository includes a set of shell-scripts inspired by [Dr Fraga's
-approach](https://www.ucl.ac.uk/~ucecesf/remarkable/). In contrast to Dr. Fraga,
-I use `rsync` rather then `fuse` mounts to manage the data transfer.
+This repository includes a set of shell-scripts written on top of [Dr Fraga's
+approach](https://www.ucl.ac.uk/~ucecesf/remarkable/) to accessing Remarkable
+data. In contrast to Dr.Fraga, we use `rsync` rather then `fuse` mounts to
+manage the data transfer.
 
 From the user's point of view, the overall process works as follows:
 
