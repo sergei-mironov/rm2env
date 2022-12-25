@@ -23,6 +23,7 @@ Contents
    * [Synchronization](#synchronization)
    * [Screen sharing](#screen-sharing)
    * [Other projects](#other-projects)
+
 Usage
 -----
 
@@ -34,16 +35,16 @@ project we encode the dependencies in Nix language in the
 [flake.nix](./flake.nix).
 
 ```sh
-$ export NIXPKGS_ALLOW_INSECURE=1 # needed for the buggy xpdf
+$ export NIXPKGS_ALLOW_INSECURE=1 # needed to allow the buggy xpdf dependency
 ```
 
 To enter the development shell:
 
 ```sh
-$ nix develop --impure # Impure is needed for Nix to notice the variable
+$ nix develop --impure # Impure is needed for Nix to notice the above variable
 ```
 
-To build a specific rule
+To build a specific rule:
 
 ```sh
 $ nix build '.#rmsynctools_def' --impure
