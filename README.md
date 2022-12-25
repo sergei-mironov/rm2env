@@ -9,11 +9,11 @@ Contents
 
 1. [Contents](#contents)
 2. [Usage](#usage)
-   * [Entering the Environment](#entering-the-environment)
-   * [Synchronizing through SSH](#synchronizing-through-ssh)
+   * [Using the Environment](#using-the-environment)
+   * [Establishing wireless SSH connection](#establishing-wireless-ssh-connection)
+   * [Accessing Remarkable PDFs from Host](#accessing-remarkable-pdfs-from-host)
    * [Linking the pointer with the Host mouse cursor](#linking-the-pointer-with-the-host-mouse-cursor)
 3. [Low-level actions](#low-level-actions)
-   * [Accessing Remarkable from Host via third-party Server using SSH forwarding](#accessing-remarkable-from-host-via-third-party-server-using-ssh-forwarding)
    * [Enabling the support of older SSH key formats](#enabling-the-support-of-older-ssh-key-formats)
    * [Setting the Host IP to connect via USB cable](#setting-the-host-ip-to-connect-via-usb-cable)
    * [Calling resync DEPRECATED](#calling-resync-deprecated)
@@ -23,28 +23,45 @@ Contents
    * [Synchronization](#synchronization)
    * [Screen sharing](#screen-sharing)
    * [Other projects](#other-projects)
-
 Usage
 -----
 
-### Entering the Environment
+### Using the Environment
 
-The scripts depend on a number of third-party tools for PDF editing. Entering
-the environment means to install all the required tools and open the shell where
-they are available.
+The scripts depend on a number of third-party tools for PDF editing. In this
+project we encode the dependencies in Nix language in the
+[default.nix](./default.nix) file which depends on Nixpkgs as described in
+[flake.nix](./flake.nix).
 
 ```sh
-$ export NIXPKGS_ALLOW_INSECURE=1 # needed for buggy xpdf
-$ nix develop --impure
+$ export NIXPKGS_ALLOW_INSECURE=1 # needed for the buggy xpdf
 ```
 
-### Synchronizing through SSH
+To enter the development shell:
+
+```sh
+$ nix develop --impure # Impure is needed for Nix to notice the variable
+```
+
+To build a specific rule
+
+```sh
+$ nix build '.#rmsynctools_def' --impure
+```
+
+### Establishing wireless SSH connection
+
+To enable SSH access to the Remarkable tablet I rely on a third-party server
+with a public IP address. I use [install-sshR](./sh/install-sshR.sh) to setup a
+Systemd service on the device and to send necessary SSH keys to the server. The
+service then maintains a connection to the server which keeps certain ports open
+and pointing back to the device.
+
+### Accessing Remarkable PDFs from Host
 
 This repository includes a set of shell-scripts inspired by [Dr Fraga's
 approach](https://www.ucl.ac.uk/~ucecesf/remarkable/). In contrast to Dr. Fraga,
-I use `rsync` rather then `fuse` mounts. My scripts are also compatible with a
-[systemd rule for SSH proxying](./sh/install-sshR) which relies on
-a thirdparty server with a public IP address.
+I use `rsync` rather then `fuse` mounts to manage the data transfer.
 
 From the user's point of view, the overall process works as follows:
 
@@ -89,34 +106,21 @@ Issues:
 Low-level actions
 -----------------
 
-### Accessing Remarkable from Host via third-party Server using SSH forwarding
-
-We need a third-party Server where SSH is controlled. Lets say its
-`~/.ssh/config` credentials has name `vps`. 4349 is a free port to listen on
-`vps`.
-
-```sh
-RM $ ssh -R0.0.0.0:4349:127.0.0.1:22 vps
-```
-```sh
-HOST $ ssh -o "ProxyCommand ssh vps nc 127.0.0.1 4349" remarkable
-```
-
-<!-- * Current IP `192.168.6.91` -->
-<!-- * Wiki page on WiFi issues https://remarkablewiki.com/tips/wifi -->
-
-
 ### Enabling the support of older SSH key formats
 
 In the Host Nix config:
 
 ```nix
-programs.ssh = let
-  algos = ["+ssh-rsa"];
-in {
-  hostKeyAlgorithms = algos;
-  pubkeyAcceptedKeyTypes = algos;
-};
+{
+#...
+  programs.ssh = let
+    algos = ["+ssh-rsa"];
+  in {
+    hostKeyAlgorithms = algos;
+    pubkeyAcceptedKeyTypes = algos;
+  };
+#...
+}
 ```
 
 ### Setting the Host IP to connect via USB cable

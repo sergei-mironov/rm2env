@@ -125,18 +125,32 @@ RM_PF=1
 if test -f "$(dirname "$0")/rmconfig" ; then
   . $(dirname "$0")/rmconfig
 fi
+if test -f "/etc/rmconfig" ; then
+  . "/etc/rmconfig"
+fi
 
+# Show the X11 progress bars with Yad or not
 rmset RM_GUI "y"
+# Enable shell tracing, typically with `set -x`
 rmset RM_VERBOSE "n"
+# Pass --dry-run whenever possible
 rmset RM_DRYRUN ""
+# Marker to annotate files received from the device
 rmset RM_AMARKER "annot"
 
+# Arguments to be passed to Yad at every call
 rmset RM_GUIARGS ""
+# Directory where to store Host's image of Remarkable document folder
 rmset RM_XOCHITL $HOME/.xochitl
+# `.ssh/config` name of a direct Remarkable connection, typically configured as
+# `root@10.11.99.1`
 rmset RM_SSH remarkable
+# `.ssh/config` name of VPS connection with public IP
 rmset RM_VPSSSH ""
+# Reverse VPS Port which Remarkable is to open to allow wireless SSH connections
 rmset RM_VPSRPORT "$RM_NOPORT"
 
-rmset RM_VPSIP "$RM_NOIP" # Optional
-rmset RM_VPSUSER "$RM_NOUSER" # Optional
-rmset RM_VPSPORT "$RM_NOPORT" # Optional
+rmset RM_VPSIP "$RM_NOIP" # Optional, could be deduced from SSH config
+rmset RM_VPSUSER "$RM_NOUSER" # Optional, could be deduced from SSH config
+rmset RM_VPSPORT "$RM_NOPORT" # Optional, could be deduced from SSH config
+
