@@ -10,6 +10,7 @@ while test -n "$1" ; do
     --no-gui) RM_GUI=n;;
     -v|--verbose) RM_VERBOSE=y;;
     --dry-run) RM_DRYRUN='--dry-run';;
+    --no-thumbnails) RM_THUMBNAILS=n ;;
     *) echo "$1" >> $flist;;
   esac
   shift
