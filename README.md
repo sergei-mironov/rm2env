@@ -218,4 +218,7 @@ Resources
 * Some nix expressions https://github.com/siraben/nix-remarkable
 * Receive files from Telegram https://github.com/Davide95/remarkaBot
   - Needs rebooting after the file is received
+* [Patched xochitl, gestures](https://github.com/ddvk/remarkable-hacks)
+  - Does not support newer versions (mine is `>3.0`)
+
 
