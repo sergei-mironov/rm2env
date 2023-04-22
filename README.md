@@ -58,6 +58,14 @@ Systemd service on the device and to send necessary SSH keys to the server. The
 service then maintains a connection to the server which keeps certain ports open
 and pointing back to the device.
 
+If the installation is successful, run the `rmssh` script
+
+```sh
+$ rmssh remarkable
+```
+
+to login using the SSH proxy via your server
+
 ### Accessing Remarkable PDFs from Host
 
 This repository includes a set of shell-scripts written on top of [Dr Fraga's
