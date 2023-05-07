@@ -34,13 +34,10 @@ project we encode the dependencies in Nix language in the
 [default.nix](./default.nix) file which depends on Nixpkgs as described in
 [flake.nix](./flake.nix).
 
-```sh
-$ export NIXPKGS_ALLOW_INSECURE=1 # needed to allow the buggy xpdf dependency
-```
-
 To enter the development shell:
 
 ```sh
+$ export NIXPKGS_ALLOW_INSECURE=1 # needed to allow the buggy xpdf dependency
 $ nix develop --impure # Impure is needed for Nix to notice the above variable
 ```
 

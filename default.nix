@@ -370,7 +370,7 @@ let
           EOF
 
           put ${./sh}/rmcommon
-          putsh ${./sh}/install-sshR.sh
+          putsh ${./sh}/rmssh-install.sh
           putsh ${./sh}/rmadd
           putsh ${./sh}/rmfind
           putsh ${./sh}/rmls
