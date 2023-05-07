@@ -153,5 +153,5 @@ rmset RM_VPSRPORT "$RM_NOPORT"
 rmset RM_VPSIP "$RM_NOIP" # Optional, could be deduced from SSH config
 rmset RM_VPSUSER "$RM_NOUSER" # Optional, could be deduced from SSH config
 rmset RM_VPSPORT "$RM_NOPORT" # Optional, could be deduced from SSH config
-rmset RM_THUMBNAILS "y"
+rmset RM_THUMBNAILS "n"
 

@@ -93,7 +93,7 @@ while [ ${page} -le ${n} ]; do
   page=$(expr $page '+' 1)
 done
 
-if test -n "$RM_THUMBNAILS" = "y" ; then
+if test "$RM_THUMBNAILS" = "y" ; then
   pdfseparate "${pdf}" ${dest}.thumbnails/%d.pdf
   page=0
   while [ ${page} -lt ${n} ]; do

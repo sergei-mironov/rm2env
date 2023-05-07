@@ -8,6 +8,10 @@ while test -n "$1" ; do
     --no-gui) RM_GUI=n ;;
     --dry-run) RM_DRYRUN='--dry-run' ;;
     -v|--verbose) RM_VERBOSE=y ;;
+    -h|--help)
+      echo "rmpush [--[no-]gui] [--dry-run] [-v|--verbose]" >&2;
+      exit 1
+      ;;
   esac
   shift
 done
@@ -44,11 +48,23 @@ killprogress "$T"
 # killprogress "$T"
 
 mkprogress "$T" "Pushing to Remarkable" "--pulsate"
-echoprogress "$T" -S 0 "Pushing..."
-rsync --out-format='#Pushing: %n%L ' $RSYNC_VERBOSE \
+# echoprogress "$T" -S 0 "Pushing..."
+# rsync --out-format='#Pushing: %n%L ' $RSYNC_VERBOSE \
+#   -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
+#   "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" | \
+#   echoprogress "$T" --add-numbers
+rsync --out-format='- - %n' $RSYNC_VERBOSE \
   -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
-  "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" | \
-  echoprogress "$T" --add-numbers
+  --partial --progress --info=progress2 \
+  "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" \
+  | awk '1;{fflush()}' RS='\r|\n' \
+  | while read size percents rest ; do
+    echo $size $percents $rest
+    case "$percents" in
+      -) F=$rest;;
+      *%) echoprogress "$T" "$percents" "Pushing \"$F\"" ;;
+    esac
+  done
 
 echoprogress "$T" "Restarting Remarkable GUI"
 rmdr rmssh "$RM_SSH" systemctl restart xochitl

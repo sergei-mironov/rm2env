@@ -8,6 +8,10 @@ while test -n "$1" ; do
     --no-gui) RM_GUI=n ;;
     --dry-run) RM_DRYRUN='--dry-run' ;;
     -v|--verbose) RM_VERBOSE=y ;;
+    -h|--help)
+      echo "rmpull [--[no-]gui] [--dry-run] [-v|--verbose]" >&2;
+      exit 1
+      ;;
   esac
   shift
 done
@@ -37,10 +41,22 @@ killprogress "$T"
 
 mkprogress "$T" "Pulling from Remarkable" "--pulsate"
 echoprogress "$T" -S 0 "Pulling..."
-rsync $RSYNC_VERBOSE --out-format='#Pulling: %n%L' \
-  -i -aP $RM_DRYRUN --delete -e "rmssh" \
-  "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
-  echoprogress "$T" --add-numbers
+# rsync $RSYNC_VERBOSE --out-format='#Pulling: %n%L' \
+#   -i -aP $RM_DRYRUN --delete -e "rmssh" \
+#   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
+#   echoprogress "$T" --add-numbers
+rsync --out-format='- - %n' $RSYNC_VERBOSE \
+  -i -a $RM_DRYRUN --delete -e "rmssh" \
+  --partial --info=progress2 \
+  "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" \
+  | awk '1;{fflush()}' RS='\r|\n' \
+  | while read size percents rest ; do
+    echo $size $percents $rest
+    case "$percents" in
+      -) F=$rest;;
+      *%) echoprogress "$T" "$percents" "Pulling \"$F\"" ;;
+    esac
+  done
 killprogress "$T"
 echo y >$T/OK
 } 2>&1 | tee -a "$LOG"

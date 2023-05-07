@@ -11,6 +11,10 @@ while test -n "$1" ; do
     -v|--verbose) RM_VERBOSE=y;;
     --dry-run) RM_DRYRUN='--dry-run';;
     --no-thumbnails) RM_THUMBNAILS=n ;;
+    -h|--help)
+      echo "rmadd [--[no-]gui] [-v|--verbose] [--dry-run] FILES" >&2
+      exit 1
+      ;;
     *) echo "$1" >> $flist;;
   esac
   shift
