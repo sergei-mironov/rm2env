@@ -133,15 +133,16 @@ rm ${tmp}/pageuuids
 mkprogress "${tmp}" "Creating overlay pages"
 for page in $(seq 1 ${numberofpages})
 do
-    # echo -e -n "processing ${uuid} page ${page} with uuid ${pageuuids[$page]}      \r" 
+    # echo -e -n "processing ${uuid} page ${page} with uuid ${pageuuids[$page]}\r"
     # again, recall 0 index page numbering for tablet
     index=$((page - 1))
     rmpage=${uuid}/${pageuuids[$index]}
     if [ -f ${rmpage}.rm ]
     then
-        # echo "converting page ${rmpage}                   "
-        python $(dirname $0)/rm2svg.py -c -i ${rmpage}.rm --width ${width} --height ${height} \
-                  -o ${tmp}/${page}.svg
+        # echo "converting page ${rmpage}"
+        python $(dirname $0)/rm2svg.py -c -i ${rmpage}.rm \
+           --width ${width} --height ${height} \
+           -o ${tmp}/${page}.svg
         if [ "$usetemplates" == "yes" ]
         then
             # echo Looking for template

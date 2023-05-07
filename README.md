@@ -1,47 +1,58 @@
-ReMarkable 2 environment
-========================
+ReMarkable 2 tools
+==================
 
-This ia a [Nix-shell](http://www.nixos.org) environment which contains Nix build
-rules for various software, related to [Remarkable2 tablet](https://remarkable.com/store/remarkable-2).
+This is a umbrella project containing author's [Nix](http://www.nixos.org) build
+expressions for various [Remarkable2 tablet](https://remarkable.com/store/remarkable-2) software.
+
+What works and what doesn't
+---------------------------
+
+* [x] SSH connectivity systemd service.
+* [x] Host-device library folder synchronisation using `rsync`.
+* [x] Importing PDF documents to the library.
+* [ ] Exporting documents from the library (`rm2svg` seems to be broken)
+* [x] RM2 stylus capturing using `remarkable_mouse`.
 
 Contents
 --------
 
-1. [Contents](#contents)
-2. [Usage](#usage)
-   * [Using the Environment](#using-the-environment)
-   * [Establishing wireless SSH connection](#establishing-wireless-ssh-connection)
-   * [Accessing Remarkable PDFs from Host](#accessing-remarkable-pdfs-from-host)
-   * [Linking the pointer with the Host mouse cursor](#linking-the-pointer-with-the-host-mouse-cursor)
-3. [Low-level actions](#low-level-actions)
-   * [Enabling the support of older SSH key formats](#enabling-the-support-of-older-ssh-key-formats)
-   * [Setting the Host IP to connect via USB cable](#setting-the-host-ip-to-connect-via-usb-cable)
-   * [Calling resync DEPRECATED](#calling-resync-deprecated)
-   * [Syncing the xochitl](#syncing-the-xochitl)
-4. [Resources](#resources)
-   * [General](#general)
-   * [Synchronization](#synchronization)
-   * [Screen sharing](#screen-sharing)
-   * [Other projects](#other-projects)
+<!-- vim-markdown-toc GFM -->
+
+* [Usage](#usage)
+  * [Using the Environment](#using-the-environment)
+  * [Establishing wireless SSH connection](#establishing-wireless-ssh-connection)
+  * [Accessing Remarkable PDFs from Host](#accessing-remarkable-pdfs-from-host)
+  * [Linking the pointer with the Host mouse cursor](#linking-the-pointer-with-the-host-mouse-cursor)
+* [Various low-level actions](#various-low-level-actions)
+  * [Enabling the older SSH key format support.](#enabling-the-older-ssh-key-format-support)
+  * [Setting up the Host IP to connect via the USB cable](#setting-up-the-host-ip-to-connect-via-the-usb-cable)
+  * [Manually syncing the xochitl](#manually-syncing-the-xochitl)
+* [Resources](#resources)
+  * [General](#general)
+  * [Synchronization](#synchronization)
+  * [Screen sharing](#screen-sharing)
+  * [Other projects](#other-projects)
+
+<!-- vim-markdown-toc -->
+
 
 Usage
 -----
 
 ### Using the Environment
 
-The scripts depend on a number of third-party tools for PDF editing. In this
-project we encode the dependencies in Nix language in the
-[default.nix](./default.nix) file which depends on Nixpkgs as described in
+The environment is defined in [Nix](https://nixos.org/nix) language in the
+[default.nix](./default.nix) file which depends on a Nixpkgs as described in
 [flake.nix](./flake.nix).
 
-To enter the development shell:
+To enter the Nix development shell, type:
 
 ```sh
 $ export NIXPKGS_ALLOW_INSECURE=1 # needed to allow the buggy xpdf dependency
 $ nix develop --impure # Impure is needed for Nix to notice the above variable
 ```
 
-To build a specific rule:
+To build a specific rule (e.g. `rmsynctools_def`):
 
 ```sh
 $ nix build '.#rmsynctools_def' --impure
@@ -49,39 +60,40 @@ $ nix build '.#rmsynctools_def' --impure
 
 ### Establishing wireless SSH connection
 
-To enable SSH access to the Remarkable tablet I rely on a third-party server
-with a public IP address. We use [install-sshR](./sh/install-sshR.sh) to setup a
-Systemd service on the device and to send necessary SSH keys to the server. The
-service then maintains a connection to the server which keeps certain ports open
-and pointing back to the device.
+To enable SSH access to the Remarkable tablet we rely on a third-party server
+with a public IP address (the VPS). We use
+[rmssh-install](./sh/rmssh-install.sh) to setup a Systemd service on the device
+and to send the necessary SSH keys to the VPS. The tablet then maintains a
+connection to the VPS by keeping certain ports opened so the users can establish
+a wireless connection to the tablet using VPS as a relay.
 
-If the installation is successful, run the `rmssh` script
+Given the successful installation, one can run the `rmssh` script in order to
+reach the tablet without connecting its USB cable.
 
 ```sh
 $ rmssh remarkable
 ```
 
-to login using the SSH proxy via your server
-
 ### Accessing Remarkable PDFs from Host
 
-This repository includes a set of shell-scripts written on top of [Dr Fraga's
-approach](https://www.ucl.ac.uk/~ucecesf/remarkable/) to accessing Remarkable
-data. In contrast to Dr.Fraga, we use `rsync` rather then `fuse` mounts to
-manage the data transfer.
+This repository includes a set of shell-scripts based on the [Dr Fraga's
+approach](https://www.ucl.ac.uk/~ucecesf/remarkable/) of accessing Remarkable
+data. In contrast to the Dr.Fraga's approach, we use `rsync` rather then
+`sshfuse` to manage the data transfer.
 
-From the user's point of view, the overall process works as follows:
+The generic workflow is shown below.
 
-1. [rmcommon](./sh/rmcommon) controls the configuration environment
-   variables.
-2. [install-sshR](./sh/install-sshR.sh) (Optional) installs the systemd
-   rule to the remarkable device and the SSH key to a third-party server with
-   public IP as configured by configuration variables. If you don't have one,
-   you can still use the default USB wire to get a direct SSH connection. This
-   step typically has to be performed once after every remarkable update.
-3. [rmpull](./sh/rmpull) pulls the whole `xochitl`
-   folder from Remarkable device to the host using the `rsync` tool. `rmpull`
-   removes all extra files on the Host that don't present on the tablet.
+1. Adjust the [rmcommon](./sh/rmcommon) that defines the main configuration
+   environment variables.
+2. Optionally run the [rmssh-install](./sh/rmssh-install.sh) to install the
+   systemd rule to the RM2 tables and to send the SSH key to a third-party VPS
+   server with the public IP as configured by configuration variables. If you
+   don't have one, you can still default to a wired SSH connection via the USB
+   cable. This step typically has to be performed once after every RM2 software
+   update.
+3. Run the [rmpull](./sh/rmpull) to pull the `xochitl` from the tablet.
+   `rmpull` removes all extra files on the Host that don't present on the
+   tablet.
 4. Modify the Host-version of `xochitl`, such as:
    - [rmls](./sh/rmls) Lists the folder's content
    - [rmfind](./sh/rmfind) Gets the document UUID by name
@@ -110,12 +122,12 @@ Issues:
 * ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
   + Specifying --password seems to have no effect (Fixed)
 
-Low-level actions
------------------
+Various low-level actions
+-------------------------
 
-### Enabling the support of older SSH key formats
+### Enabling the older SSH key format support.
 
-In the Host Nix config:
+In the Host's Nix configuration:
 
 ```nix
 {
@@ -130,7 +142,7 @@ In the Host Nix config:
 }
 ```
 
-### Setting the Host IP to connect via USB cable
+### Setting up the Host IP to connect via the USB cable
 
 ```sh
 $ sudo ifconfig enp3s0u1 10.11.99.2 netmask 255.255.255.0
@@ -139,14 +151,7 @@ $ sudo ifconfig enp3s0u1 10.11.99.2 netmask 255.255.255.0
 .. or set up NetworkManager to automatically assign IP address
 
 
-### Calling resync DEPRECATED
-
-```sh
-$ resync.py -r remarkable -v  backup  -o _rm2sync
-```
-
-
-### Syncing the xochitl
+### Manually syncing the xochitl
 
 Remarkable->Host transfer with deletion (remove --dry-run)
 
@@ -177,7 +182,7 @@ Resources
 
 - Remarkable CLI tooling https://github.com/cherti/remarkable-cli-tooling
   + Could be up-to-date; More or less works
-  + Can't remove file from remarkable
+  + Couldn't remove file from remarkable
   + Sent Pull request and filed an issue
     * https://github.com/cherti/remarkable-cli-tooling/issues/5
 - Prof. Fraga's page on remarkable with lots of useful scripts
@@ -185,7 +190,6 @@ Resources
   + [rm2pdf.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/pdf2rm.sh)
   + [rmlist.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmlist.sh)
   + [rmconvert.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmconvert.sh)
-  + Author e-mail `e.fraga@ucl.ac.uk`
 - https://github.com/simonschllng/rm-sync
   + Written in pure Shell curl calls are commented-out
   + Seems to be a local script, incomplete
@@ -205,23 +209,23 @@ Resources
 - https://github.com/codetist/remarkable2-cloudsync
   + A script which uses `Rclone` binary.
 - Remi https://github.com/bordaigorl/remy
-  + GUI, Not outdated
-  + I didn't check it
+  + GUI, seems to be up to date.
+  + Not checked.
 
 ### Screen sharing
 
 * reMarkable mouse
   - https://github.com/evidlo/remarkable_mouse
   - https://github.com/kevinconway/remouseable
-* reStream https://github.com/rien/reStream
+* [reStream](https://github.com/rien/reStream)
 
 ### Other projects
 
-* SSH access and backups https://remarkablewiki.com/tech/ssh#ssh_access
-* Entware https://github.com/evidlo/remarkable_entware
+* [SSH access and backups](https://remarkablewiki.com/tech/ssh#ssh_access)
+* [Entware](https://github.com/evidlo/remarkable_entware)
 * `Rm_tools` https://github.com/lschwetlick/maxio/tree/master/rm_tools
-* Some nix expressions https://github.com/siraben/nix-remarkable
-* Receive files from Telegram https://github.com/Davide95/remarkaBot
+* [Some nix expressions](https://github.com/siraben/nix-remarkable)
+* [Receive files from Telegram](https://github.com/Davide95/remarkaBot)
   - Needs rebooting after the file is received
 * [Patched xochitl, gestures](https://github.com/ddvk/remarkable-hacks)
   - Does not support newer versions (mine is `>3.0`)
