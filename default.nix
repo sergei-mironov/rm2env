@@ -222,7 +222,9 @@ let
         version = "1.1.0";
         doCheck = false; # Needs pytest-runner
 
-        propagatedBuildInputs = with python ; [ reportlab lxml cssselect2 pillow ];
+        propagatedBuildInputs = with python ; [
+          reportlab lxml cssselect2 pillow
+        ];
 
         # nativeBuildInputs = [ pkgs.libxdg ];
         src = python.fetchPypi {
@@ -265,6 +267,20 @@ let
         };
       };
 
+      rmscene = python.buildPythonPackage rec {
+        pname = "rmscene";
+        version = "0.3.0";
+        format = "pyproject";
+        src = ./3rdparty/rmscene;
+
+        nativeBuildInputs = with python; [ poetry-core packaging ];
+
+        postPatch = ''
+          substituteInPlace pyproject.toml \
+            --replace "packaging = \"^23.0\"" "packaging = \">1.0\""
+        '';
+      };
+
 
       rm_tools = python.buildPythonPackage rec {
         pname = "rm_tools";
@@ -275,6 +291,23 @@ let
         # See https://github.com/reHackable/maxio/tree/master/tools
         src = ./3rdparty/maxio;
       };
+
+      rm2svg = python.buildPythonPackage rec {
+        pname = "rm2svg";
+        version = "1.0";
+        propagatedBuildInputs = with python ; [ pypdf2 rmscene ];
+        # doCheck = false;
+
+        # src = ./3rdparty/maxio;
+        src = pkgs.fetchFromGitHub {
+          owner = "lschwetlick";
+          repo = "maxio";
+          rev = "refs/pull/7/head";
+          sha256 = "sha256-MUabgSZ18/0GChbPbSRBunONvrFocdu5yVwTdqs0YXo=";
+        };
+      };
+
+
 
       # rMsync = python.buildPythonApplication rec {
       #   pname = "rMsync";
@@ -315,7 +348,8 @@ let
           putbash ${./3rdparty/fraga}/rmlist.sh
           putbash ${./3rdparty/fraga}/rmconvert.sh
           substituteInPlace $out/bin/rmconvert.sh \
-            --replace "\''${software}/getpageuuids.awk" ${./3rdparty/fraga/getpageuuids.awk}
+            --replace "\''${software}/getpageuuids.awk" \
+            ${./3rdparty/fraga/getpageuuids.awk}
           wrapProgram $out/bin/rmconvert.sh \
             --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
                 python3 inkscape xpdf pdftk ghostscript poppler_utils])}
