@@ -399,7 +399,8 @@ let
           rmset RM_SSH ${C.ssh}
           rmset RM_VPSSSH ${C.vpsssh}
           rmset RM_XOCHITL ${C.xochitl}
-          rmset RM_VPSRPORT ${toString C.vpsrport}
+          rmset RM_VPSRPORT_A ${toString C.vpsrport_A}
+          rmset RM_VPSRPORT_B ${toString C.vpsrport_B}
           ${C.extraConfig}
           EOF
 
