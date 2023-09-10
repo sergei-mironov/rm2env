@@ -4,12 +4,13 @@
 
 while test -n "$1" ; do
   case "$1" in
+    -D) RM_DEVICE=$2 ; shift ;;
     --gui) RM_GUI=y ;;
     --no-gui) RM_GUI=n ;;
     --dry-run) RM_DRYRUN='--dry-run' ;;
     -v|--verbose) RM_VERBOSE=y ;;
     -h|--help)
-      echo "rmpush [--[no-]gui] [--dry-run] [-v|--verbose]" >&2;
+      echo "rmpush [-D (A|B)] [--[no-]gui] [--dry-run] [-v|--verbose]" >&2;
       exit 1
       ;;
   esac
@@ -47,7 +48,7 @@ killprogress "$T"
 #   echoprogress "$T" --add-numbers
 # killprogress "$T"
 
-mkprogress "$T" "Pushing to Remarkable" "--pulsate"
+mkprogress "$T" "Pushing to Remarkable $RM_DEVICE" "--pulsate"
 # echoprogress "$T" -S 0 "Pushing..."
 # rsync --out-format='#Pushing: %n%L ' $RSYNC_VERBOSE \
 #   -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
@@ -66,7 +67,7 @@ rsync --out-format='- - %n' $RSYNC_VERBOSE \
     esac
   done
 
-echoprogress "$T" "Restarting Remarkable GUI"
+echoprogress "$T" "Restarting Remarkable $RM_DEVICE GUI"
 rmdr rmssh "$RM_SSH" systemctl restart xochitl
 killprogress "$T"
 echo y > $T/OK

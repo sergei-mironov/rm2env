@@ -4,12 +4,14 @@
 
 while test -n "$1" ; do
   case "$1" in
+    -D) RM_DEVICE=$2 ; shift ;;
     --gui) RM_GUI=y ;;
     --no-gui) RM_GUI=n ;;
     --dry-run) RM_DRYRUN='--dry-run' ;;
+    --delete) RM_DELETE='--delete' ;;
     -v|--verbose) RM_VERBOSE=y ;;
     -h|--help)
-      echo "rmpull [--[no-]gui] [--dry-run] [-v|--verbose]" >&2;
+      echo "rmpull [-D (A|B)] [--[no-]gui] [--dry-run] [-v|--verbose] [--delete]" >&2;
       exit 1
       ;;
   esac
@@ -39,14 +41,14 @@ while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
 done
 killprogress "$T"
 
-mkprogress "$T" "Pulling from Remarkable" "--pulsate"
+mkprogress "$T" "Pulling from Remarkable $RM_DEVICE" "--pulsate"
 echoprogress "$T" -S 0 "Pulling..."
 # rsync $RSYNC_VERBOSE --out-format='#Pulling: %n%L' \
 #   -i -aP $RM_DRYRUN --delete -e "rmssh" \
 #   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
 #   echoprogress "$T" --add-numbers
 rsync --out-format='- - %n' $RSYNC_VERBOSE \
-  -i -a $RM_DRYRUN --delete -e "rmssh" \
+  -i -a $RM_DRYRUN $RM_DELETE -e "rmssh" \
   --partial --info=progress2 \
   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" \
   | awk '1;{fflush()}' RS='\r|\n' \

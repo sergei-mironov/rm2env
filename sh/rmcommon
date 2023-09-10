@@ -117,6 +117,14 @@ echoprogress() {(
   fi
 )}
 
+rmvpsrport() {
+  case "$RM_DEVICE" in
+    A) echo "$RM_VPSRPORT_A" ;;
+    B) echo "$RM_VPSRPORT_B" ;;
+    *) rmdie "RM_DEVICE is invalid ($RM_DEVICE) or not specified" ;;
+  esac
+}
+
 RM_NOUSER="<INVALID_USER>"
 RM_NOIP="<INVALID_IP>"
 RM_NOPORT="<INVALID_PORT>"
@@ -147,11 +155,13 @@ rmset RM_XOCHITL $HOME/.xochitl
 rmset RM_SSH remarkable
 # `.ssh/config` name of VPS connection with public IP
 rmset RM_VPSSSH ""
-# Reverse VPS Port which Remarkable is to open to allow wireless SSH connections
-rmset RM_VPSRPORT "$RM_NOPORT"
+# Reverse VPS Port(s) that Remarkable(s) are to open to allow wireless SSH connections
+rmset RM_VPSRPORT_A "$RM_NOPORT"
+rmset RM_VPSRPORT_B "$RM_NOPORT"
 
 rmset RM_VPSIP "$RM_NOIP" # Optional, could be deduced from SSH config
 rmset RM_VPSUSER "$RM_NOUSER" # Optional, could be deduced from SSH config
 rmset RM_VPSPORT "$RM_NOPORT" # Optional, could be deduced from SSH config
 rmset RM_THUMBNAILS "n"
+rmset RM_DEVICE "A" # Use device 'A' by default
 

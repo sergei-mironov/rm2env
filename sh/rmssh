@@ -14,10 +14,8 @@ else
 fi
 
 if test -n "$RM_VPSSSH" ; then
-  if test "$RM_VPSRPORT" = "$RM_NOPORT" ; then
-    rmdie "RM_VPSSSH is set, but RM_VPSRPORT does not"
-  fi
-  exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $RM_VPSRPORT" "$@"
+  VPSRPORT=`rmvpsrport`
+  exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" "$@"
 else
   exec ssh "$@"
 fi
