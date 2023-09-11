@@ -35,24 +35,23 @@ Contents
 
 <!-- vim-markdown-toc -->
 
-
 Usage
 -----
 
-### Using the Environment
+### Nix development shell
 
-The environment is defined in [Nix](https://nixos.org/nix) language in the
-[default.nix](./default.nix) file which depends on a Nixpkgs as described in
-[flake.nix](./flake.nix).
+We use [Nix](https://nixos.org/nix) to track the library dependencies. Main expressions
+are defined in [default.nix](./default.nix). [flake.nix](./flake.nix) describes
+the relationships to other Nix repositories, inclding the main Nixpkgs repo.
 
-To enter the Nix development shell, type:
+To run the development shell, type:
 
 ```sh
 $ export NIXPKGS_ALLOW_INSECURE=1 # needed to allow the buggy xpdf dependency
 $ nix develop --impure # Impure is needed for Nix to notice the above variable
 ```
 
-To build a specific rule (e.g. `rmsynctools_def`):
+To build a specific Nix expression (e.g. `rmsynctools_def`):
 
 ```sh
 $ nix build '.#rmsynctools_def' --impure
@@ -74,27 +73,28 @@ reach the tablet without connecting its USB cable.
 $ rmssh remarkable
 ```
 
-### Accessing Remarkable PDFs from Host
+Sub-projects
+------------
 
-This repository includes a set of shell-scripts based on the [Dr Fraga's
-approach](https://www.ucl.ac.uk/~ucecesf/remarkable/) of accessing Remarkable
-data. In contrast to the Dr.Fraga's approach, we use `rsync` rather then
-`sshfuse` to manage the data transfer.
+### rmsynctools
 
-The generic workflow is shown below.
+Rmsynctools is a set of shell scripts for synchronizing document trees between
+the Host and RM2 device. Our approach is inspired by
+[Dr Fraga's](https://www.ucl.ac.uk/~ucecesf/remarkable/) work. In contrast to
+it, we use `rsync` rather then `sshfuse` to manage the actual data transfer.
+
+The workflow is shown below.
 
 1. Adjust the [rmcommon](./sh/rmcommon) that defines the main configuration
    environment variables.
 2. Optionally run the [rmssh-install](./sh/rmssh-install.sh) to install the
-   systemd rule to the RM2 tables and to send the SSH key to a third-party VPS
-   server with the public IP as configured by configuration variables. If you
-   don't have one, you can still default to a wired SSH connection via the USB
-   cable. This step typically has to be performed once after every RM2 software
-   update.
-3. Run the [rmpull](./sh/rmpull) to pull the `xochitl` from the tablet.
-   `rmpull` removes all extra files on the Host that don't present on the
-   tablet.
-4. Modify the Host-version of `xochitl`, such as:
+   systemd service rule to the RM2 device. Provided with the VPS requisites, the
+   service would run the reverse SSH tunnel allowing the wireless access to RM2
+   device.
+3. Run the [rmpull](./sh/rmpull) to pull the `xochitl` from RM2 device to Host.
+   Pass `--delete` argument to remove files that don't present on the tablet.
+4. Investigate and modify the Host-version of `xochitl` using one of the
+   following:
    - [rmls](./sh/rmls) Lists the folder's content
    - [rmfind](./sh/rmfind) Gets the document UUID by name
    - [rmconvert](./3rdparty/fraga/rmconvert) of Dr.Fraga builds the
@@ -102,15 +102,14 @@ The generic workflow is shown below.
      + Currently, getting annotaded documents doesn't rely on the Remarkable
        web-server.  Unfortunately, `rmconvert` is pretty slow and has some
        issues with SVG graphics in PDF documents.
-   - [rmadd](./sh/rmadd) adds new document
-5. [rmpush](./sh/rmpush) pushes Host's `xochitl` back to the
-   device. `rmpush` doesn't remove anything from the table. Use the tablet
-   GUI for the removal.
+   - [rmadd](./sh/rmadd) adds new document to the file tree
+5. Run [rmpush](./sh/rmpush) to push the modified `xochitl` tree back to the
+   RM2 device. `rmpush` doesn't remove anything from the tablet.
 
 
-### Linking the pointer with the Host mouse cursor
+### Remouse
 
-Connect the device to Host and do the following
+To link the RM2 stylus with the Host mouse, do
 
 ```sh
 $ echo 'password' >_pass.txt
@@ -120,7 +119,7 @@ $ ./runmouse.sh
 Issues:
 
 * ~~https://github.com/Evidlo/remarkable_mouse/issues/63~~
-  + Specifying --password seems to have no effect (Fixed)
+  + ~~Specifying --password seems to have no effect~~ (Fixed)
 
 Various low-level actions
 -------------------------
@@ -180,16 +179,17 @@ Resources
 
 ### Synchronization
 
-- Remarkable CLI tooling https://github.com/cherti/remarkable-cli-tooling
+- Prof. Fraga's page on remarkable with lots of useful scripts
+  https://www.ucl.ac.uk/~ucecesf/remarkable/
+  + Last seen modification date: 2022-09-28
+  + [rm2pdf.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/pdf2rm.sh)
+  + [rmlist.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmlist.sh)
+  + [rmconvert.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmconvert.sh)
+- [Remarkable CLI tooling](https://github.com/cherti/remarkable-cli-tooling)
   + Could be up-to-date; More or less works
   + Couldn't remove file from remarkable
   + Sent Pull request and filed an issue
     * https://github.com/cherti/remarkable-cli-tooling/issues/5
-- Prof. Fraga's page on remarkable with lots of useful scripts
-  https://www.ucl.ac.uk/~ucecesf/remarkable/
-  + [rm2pdf.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/pdf2rm.sh)
-  + [rmlist.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmlist.sh)
-  + [rmconvert.sh](https://www.ucl.ac.uk/~ucecesf/remarkable/rmconvert.sh)
 - https://github.com/simonschllng/rm-sync
   + Written in pure Shell curl calls are commented-out
   + Seems to be a local script, incomplete
