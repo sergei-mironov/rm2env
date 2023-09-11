@@ -19,10 +19,11 @@ Contents
 <!-- vim-markdown-toc GFM -->
 
 * [Usage](#usage)
-  * [Using the Environment](#using-the-environment)
+  * [Nix development shell](#nix-development-shell)
   * [Establishing wireless SSH connection](#establishing-wireless-ssh-connection)
-  * [Accessing Remarkable PDFs from Host](#accessing-remarkable-pdfs-from-host)
-  * [Linking the pointer with the Host mouse cursor](#linking-the-pointer-with-the-host-mouse-cursor)
+* [Sub-projects](#sub-projects)
+  * [Rmsynctools](#rmsynctools)
+  * [Remouse](#remouse)
 * [Various low-level actions](#various-low-level-actions)
   * [Enabling the older SSH key format support.](#enabling-the-older-ssh-key-format-support)
   * [Setting up the Host IP to connect via the USB cable](#setting-up-the-host-ip-to-connect-via-the-usb-cable)
@@ -76,7 +77,7 @@ $ rmssh remarkable
 Sub-projects
 ------------
 
-### rmsynctools
+### Rmsynctools
 
 Rmsynctools is a set of shell scripts for synchronizing document trees between
 the Host and RM2 device. Our approach is inspired by
@@ -93,12 +94,11 @@ The workflow is shown below.
    device.
 3. Run the [rmpull](./sh/rmpull) to pull the `xochitl` from RM2 device to Host.
    Pass `--delete` argument to remove files that don't present on the tablet.
-4. Investigate and modify the Host-version of `xochitl` using one of the
-   following:
+4. View or modify the Host copy of `xochitl` using one of the
+   following scripts:
    - [rmls](./sh/rmls) Lists the folder's content
    - [rmfind](./sh/rmfind) Gets the document UUID by name
-   - [rmconvert](./3rdparty/fraga/rmconvert) of Dr.Fraga builds the
-     annotated PDF by UUID.
+   - [rmconvert](./sh/rmconvert) of Dr.Fraga builds the annotated PDF by UUID.
      + Currently, getting annotaded documents doesn't rely on the Remarkable
        web-server.  Unfortunately, `rmconvert` is pretty slow and has some
        issues with SVG graphics in PDF documents.
