@@ -216,16 +216,14 @@ then
         then
             if [ -f ${tmp}/${page}.pdf ]
             then
-                echoprogress "$tmp" \
-                  "Overlaying page ${page} with annotations" || exit 1
+                echoprogress "$tmp" "Overlaying page ${page} with annotations" || exit 1
                 cp ${tmp}/${page}.pdf tmp.pdf
                 pdftk tmp.pdf background ${tmp}/original-${page}.pdf \
                       output ${tmp}/${page}-tmp.pdf
                 rm tmp.pdf
                 rm ${tmp}/original-${page}.pdf
             else
-                echoprogress "$tmp" \
-                  "Keeping page ${page}" || exit 1
+                echoprogress "$tmp" "Keeping page ${page}" || exit 1
                 mv ${tmp}/original-${page}.pdf ${tmp}/${page}-tmp.pdf
             fi
             # use ghostscript to compress the resulting PDF,

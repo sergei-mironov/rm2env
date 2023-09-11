@@ -47,10 +47,11 @@ mkprogress() {
   test "$RM_GUI" = "y" || return 0
   d="$1"
   title="$2"
+  opts="$3"
   test -d "$d" || return 1
   rm "$d/fifo" 2>/dev/null || true
   mkfifo "$d/fifo"
-  (IFS=' '; yad $RM_GUIARGS --progress --title="$title" "$3" < "$d/fifo" &
+  (IFS=' '; yad $RM_GUIARGS --progress --title="$title" $opts < "$d/fifo" &
     echo "$!" > "$d/yad.pid"
   )
   exec 5>"$d/fifo"
@@ -71,9 +72,7 @@ killprogress() {
 echoprogress() {(
   # Update the progressbar
   set +x
-  # test "$RM_GUI" = "y" || return 0
-  shift # T is not used
-  READINP=y
+  shift # First argument (T) is ignored
   ADDNUMBERS=n
   SILENTNUMBERS=n
   while test -n "$1" ; do
@@ -83,38 +82,19 @@ echoprogress() {(
       [0-9]*)
         test "$RM_PF" != "1" && echo "$1" >&$RM_PF
         test "$SILENTNUMBERS" = "n" && echo "$1"
-        READINP=n
         ;;
       \#*)
         test "$RM_PF" != "1" && echo "$1" >&$RM_PF
         echo "$1"
-        READINP=n
         ;;
-      -) READINP=y ;;
-      *) echo "#$1" >&$RM_PF; echo "$1"; READINP=n ;;
+      -) rmwarn "WARNING: stdin mode is not supported in echoprogress" ;;
+      *)
+        test "$RM_PF" != "1" && echo "#$1" >&$RM_PF
+        echo "$1"
+        ;;
     esac
     shift
   done
-  if test "$READINP" = "y" ; then
-    i=0
-    while read L ; do
-      case $L in
-        [0-9]*)
-          test "$RM_PF" != "1" && echo $L >&$RM_PF
-          test "$SILENTNUMBERS" = "n" && echo $L
-          ;;
-        \#*)
-          if test "$ADDNUMBERS" = "y"; then
-            test "$RM_PF" != "1" && echo $i >&$RM_PF
-          fi
-          test "$RM_PF" != "1" && echo $L >&$RM_PF
-          echo $L
-          ;;
-        *) echo $L ;;
-      esac
-      i=$(expr $i '+' 1)
-    done
-  fi
 )}
 
 rmvpsrport() {
@@ -152,7 +132,7 @@ rmset RM_GUIARGS ""
 rmset RM_XOCHITL $HOME/.xochitl
 # `.ssh/config` name of a direct Remarkable connection, typically configured as
 # `root@10.11.99.1`
-rmset RM_SSH remarkable
+rmset RM_SSH "remarkable"
 # `.ssh/config` name of VPS connection with public IP
 rmset RM_VPSSSH ""
 # Reverse VPS Port(s) that Remarkable(s) are to open to allow wireless SSH connections

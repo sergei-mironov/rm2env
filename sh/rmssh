@@ -6,7 +6,7 @@ CMD=""
 NCTO='-w 5'
 while test -n "$1" ; do
   case "$1" in
-    -D) RM_DEVICE=$2 ; shift ;;
+    -D) RM_DEVICE="$2" ; shift ;;
     -v|--verbose) RM_VERBOSE=y ;;
     --no-timeout) NCTO='' ;;
     -h|--help)
@@ -24,7 +24,12 @@ fi
 
 if test -n "$RM_VPSSSH" ; then
   VPSRPORT=`rmvpsrport`
-  exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" $CMD
+  exec ssh \
+    -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" \
+    -o "StrictHostKeyChecking=no" \
+    $CMD
 else
-  exec ssh $CMD
+  exec ssh \
+    -o "StrictHostKeyChecking=no" \
+    $CMD
 fi

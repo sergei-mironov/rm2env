@@ -84,16 +84,19 @@ the Host and RM2 device. Our approach is inspired by
 [Dr Fraga's](https://www.ucl.ac.uk/~ucecesf/remarkable/) work. In contrast to
 it, we use `rsync` rather then `sshfuse` to manage the actual data transfer.
 
-The workflow is shown below.
+The workflow:
 
 1. Adjust the [rmcommon](./sh/rmcommon) that defines the main configuration
    environment variables.
 2. Optionally run the [rmssh-install](./sh/rmssh-install.sh) to install the
    systemd service rule to the RM2 device. Provided with the VPS requisites, the
-   service would run the reverse SSH tunnel allowing the wireless access to RM2
-   device.
-3. Run the [rmpull](./sh/rmpull) to pull the `xochitl` from RM2 device to Host.
-   Pass `--delete` argument to remove files that don't present on the tablet.
+   script will install the RM2 systemd running the reverse SSH tunnel from VPS
+   host to RM2 device.  allowing the wireless access to RM2 device.
+   [rmssh](./sh/rmssh) script can be used to connect to the device using this
+   tunnel.
+3. Run the [rmpull](./sh/rmpull) to pull the `xochitl` tree from RM2 device to
+   Host.  Pass `--delete` argument to also remove Host files that don't present
+   on the tablet.
 4. View or modify the Host copy of `xochitl` using one of the
    following scripts:
    - [rmls](./sh/rmls) Lists the folder's content
@@ -106,13 +109,15 @@ The workflow is shown below.
 5. Run [rmpush](./sh/rmpush) to push the modified `xochitl` tree back to the
    RM2 device. `rmpush` doesn't remove anything from the tablet.
 
+All transport scripts support accessing up to two RM2 devices using the reverse
+SSH tunnel. See `-D (A|B)` command line argument.
 
 ### Remouse
 
 To link the RM2 stylus with the Host mouse, do
 
 ```sh
-$ echo 'password' >_pass.txt
+$ echo 'password' >_pass.txt # RM2 root password
 $ ./runmouse.sh
 ```
 
@@ -227,8 +232,11 @@ Resources
 * [Some nix expressions](https://github.com/siraben/nix-remarkable)
 * [Receive files from Telegram](https://github.com/Davide95/remarkaBot)
   - Needs rebooting after the file is received
-* [Patched xochitl, gestures](https://github.com/ddvk/remarkable-hacks)
-  - Does not support newer versions (mine is `>3.0`)
+* [ddvk/remarkable-hacks](https://github.com/ddvk/remarkable-hacks)
+  - Lots of RM2 GUI hacks
+  - Does not support newer versions (mine is `>3.0`), see the related
+    [issue](https://github.com/ddvk/remarkable-hacks/issues/496).
 * [rmscene](https://github.com/ricklupton/rmscene) .RM files converter
+* [Codexctl](https://github.com/Jayy001/codexctl) CLI for update server
 
 

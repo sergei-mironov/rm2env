@@ -2,6 +2,8 @@
 
 . $(dirname $0)/rmcommon
 
+INCLUDE_THUMBNAILS=n
+
 while test -n "$1" ; do
   case "$1" in
     -D) RM_DEVICE=$2 ; shift ;;
@@ -9,6 +11,7 @@ while test -n "$1" ; do
     --no-gui) RM_GUI=n ;;
     --dry-run) RM_DRYRUN='--dry-run' ;;
     --delete) RM_DELETE='--delete' ;;
+    --include-thumbnails) INCLUDE_THUMBNAILS=y ;;
     -v|--verbose) RM_VERBOSE=y ;;
     -h|--help)
       echo "rmpull [-D (A|B)] [--[no-]gui] [--dry-run] [-v|--verbose] [--delete]" >&2;
@@ -32,6 +35,11 @@ T=$(mktemp -d --tmpdir)
 LOG=$T/rmpull_$UID.txt
 trap "killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
 
+echo >$T/exclude.files
+if test "$INCLUDE_THUMBNAILS" = "n" ; then
+  echo "*.thumbnails" >> $T/exclude.files
+fi
+
 {
 mkprogress "$T" "Checking the connection" "--pulsate"
 echoprogress "$T" -S 0 "Checking the connection"
@@ -41,22 +49,32 @@ while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
 done
 killprogress "$T"
 
-mkprogress "$T" "Pulling from Remarkable $RM_DEVICE" "--pulsate"
+mkprogress "$T" "Pulling from Remarkable $RM_DEVICE"
 echoprogress "$T" -S 0 "Pulling..."
-# rsync $RSYNC_VERBOSE --out-format='#Pulling: %n%L' \
-#   -i -aP $RM_DRYRUN --delete -e "rmssh" \
-#   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
-#   echoprogress "$T" --add-numbers
-rsync --out-format='- - %n' $RSYNC_VERBOSE \
-  -i -a $RM_DRYRUN $RM_DELETE -e "rmssh" \
-  --partial --info=progress2 \
-  "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" \
+
+do_rsync() {
+  rsync --out-format='- - %n' \
+    -i -a $RM_DELETE -e "rmssh" \
+    --partial \
+    --exclude-from=$T/exclude.files \
+    "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" \
+    "$@"
+}
+
+I=0
+NFILES=`do_rsync --dry-run | wc -l`
+do_rsync $RM_DRYRUN $RSYNC_VERBOSE \
   | awk '1;{fflush()}' RS='\r|\n' \
-  | while read size percents rest ; do
-    echo $size $percents $rest
-    case "$percents" in
-      -) F=$rest;;
-      *%) echoprogress "$T" "$percents" "Pulling \"$F\"" ;;
+  | while read a b file ; do
+    case $a$b in
+    --)
+      P=$(awk "BEGIN{print ($I/$NFILES)*100}")
+      echoprogress "$T" "$P" "Pulling \"$file\""
+      I=$(expr $I '+' 1)
+      ;;
+    *)
+      echo $a $b $file
+      ;;
     esac
   done
 killprogress "$T"

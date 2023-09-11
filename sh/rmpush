@@ -2,12 +2,14 @@
 
 . $(dirname $0)/rmcommon
 
+INCLUDE_THUMBNAILS=n
 while test -n "$1" ; do
   case "$1" in
     -D) RM_DEVICE=$2 ; shift ;;
     --gui) RM_GUI=y ;;
     --no-gui) RM_GUI=n ;;
     --dry-run) RM_DRYRUN='--dry-run' ;;
+    --include-thumbnails) INCLUDE_THUMBNAILS=y ;;
     -v|--verbose) RM_VERBOSE=y ;;
     -h|--help)
       echo "rmpush [-D (A|B)] [--[no-]gui] [--dry-run] [-v|--verbose]" >&2;
@@ -31,6 +33,11 @@ T=$(mktemp -d --tmpdir)
 LOG=$T/rmpull_$UID.txt
 trap "killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
 
+echo >$T/exclude.files
+if test "$INCLUDE_THUMBNAILS" = "n" ; then
+  echo "*.thumbnails" >> $T/exclude.files
+fi
+
 {
 mkprogress "$T" "Checking the connection" "--pulsate"
 echoprogress "$T" -S 0 "Checking the connection"
@@ -40,35 +47,37 @@ while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
 done
 killprogress "$T"
 
-# mkprogress "$T" "Pulling from Remarkable" "--pulsate"
-# echoprogress "$T" -S 0 "Pulling..."
-# rsync --out-format='#Pulling: %n%L' $RSYNC_VERBOSE \
-#   -i -aP $RM_DRYRUN -e "rmssh" \
-#   "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" "${RM_XOCHITL}/" | \
-#   echoprogress "$T" --add-numbers
-# killprogress "$T"
+mkprogress "$T" "Pushing to Remarkable $RM_DEVICE"
+echoprogress "$T" -S 0 "Pushing..."
 
-mkprogress "$T" "Pushing to Remarkable $RM_DEVICE" "--pulsate"
-# echoprogress "$T" -S 0 "Pushing..."
-# rsync --out-format='#Pushing: %n%L ' $RSYNC_VERBOSE \
-#   -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
-#   "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" | \
-#   echoprogress "$T" --add-numbers
-rsync --out-format='- - %n' $RSYNC_VERBOSE \
-  -i -aP $RM_DRYRUN --no-owner --no-group -e "rmssh" \
-  --partial --progress --info=progress2 \
-  "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" \
+do_rsync() {
+  rsync --out-format='- - %n' \
+    -i -aP --no-owner --no-group -e "rmssh" \
+    --partial \
+    --exclude-from=$T/exclude.files \
+    "${RM_XOCHITL}/" "$RM_SSH:/home/root/.local/share/remarkable/xochitl/" \
+    "$@"
+}
+
+I=0
+NFILES=`do_rsync --dry-run | wc -l`
+do_rsync $RM_DRYRUN $RSYNC_VERBOSE \
   | awk '1;{fflush()}' RS='\r|\n' \
-  | while read size percents rest ; do
-    echo $size $percents $rest
-    case "$percents" in
-      -) F=$rest;;
-      *%) echoprogress "$T" "$percents" "Pushing \"$F\"" ;;
+  | while read a b file ; do
+    case $a$b in
+    --)
+      P=$(awk "BEGIN{print ($I/$NFILES)*100}")
+      echoprogress "$T" "$P" "Pushing \"$file\""
+      I=$(expr $I '+' 1)
+      ;;
+    *)
+      echo $a $b $file
+      ;;
     esac
   done
 
 echoprogress "$T" "Restarting Remarkable $RM_DEVICE GUI"
-rmdr rmssh "$RM_SSH" systemctl restart xochitl
+rmdr bash $(dirname $0)/rmssh "$RM_SSH" systemctl restart xochitl
 killprogress "$T"
 echo y > $T/OK
 } 2>&1 | tee -a "$LOG"
