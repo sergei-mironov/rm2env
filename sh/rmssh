@@ -2,20 +2,29 @@
 
 . $(dirname $0)/rmcommon
 
+CMD=""
+NCTO='-w 5'
+while test -n "$1" ; do
+  case "$1" in
+    -D) RM_DEVICE=$2 ; shift ;;
+    -v|--verbose) RM_VERBOSE=y ;;
+    --no-timeout) NCTO='' ;;
+    -h|--help)
+      echo "rmssh [-D (A|B)] [--no-timeout] [-v|--verbose] SSH_ARGS..." >&2;
+      exit 1
+      ;;
+    *) CMD="$CMD $1" ;;
+  esac
+  shift
+done
+
 if test "$RM_VERBOSE" = "y" ; then
   set -x
 fi
 
-if test "$1" = "--no-timeout" ; then
-  NCTO=''
-  shift
-else
-  NCTO='-w 5'
-fi
-
 if test -n "$RM_VPSSSH" ; then
   VPSRPORT=`rmvpsrport`
-  exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" "$@"
+  exec ssh -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" $CMD
 else
-  exec ssh "$@"
+  exec ssh $CMD
 fi
