@@ -19,7 +19,6 @@ while test -n "$1" ; do
 done
 
 set -e -x
-test -f "$F"
 
 rmcheck
 
@@ -28,5 +27,10 @@ if ! test -f "$CACHE" ; then
   rmls >$CACHE
 fi
 
-FN=$(basename "$F" .pdf)
+if test -f "$F" ; then
+  FN=$(basename "$F" .pdf)
+else
+  FN="$F"
+fi
+
 grep --fixed-strings "$FN" "$CACHE" | awk '{print $1}'

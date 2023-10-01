@@ -110,6 +110,9 @@ RM_NOIP="<INVALID_IP>"
 RM_NOPORT="<INVALID_PORT>"
 
 RM_PF=1
+if test -f "./_rmconfig" ; then
+  . ./_rmconfig
+fi
 if test -f "$(dirname "$0")/rmconfig" ; then
   . $(dirname "$0")/rmconfig
 fi

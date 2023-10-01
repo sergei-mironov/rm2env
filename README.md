@@ -58,6 +58,17 @@ To build a specific Nix expression (e.g. `rmsynctools_def`):
 $ nix build '.#rmsynctools_def' --impure
 ```
 
+To enable the specific configuration without installing scripts, link it into
+the `./_rmconfig` file in the current directory and source `./sh/rmcommon`.
+
+``` sh
+$ ln -s ./sh/nixconfig.sh _rmcommon
+$ . ./sh/rmcommon # Optionally
+```
+
+Then you could run `./sh/rm*` in-place scripts wihtout installing them into the
+system.
+
 ### Establishing wireless SSH connection
 
 To enable SSH access to the Remarkable tablet we rely on a third-party server

@@ -2,8 +2,8 @@
   "nodes": {
     "nixpkgs": {
       "locked": {
-        "lastModified": 1691688777,
-        "narHash": "sha256-zz+inczkSeZaC+zWbqayrgq5EcizkVEherCGiZMhlN4=",
+        "lastModified": 1694954845,
+        "narHash": "sha256-LdM6LtkUJgtlaqbYMmxV37iDVw8LfGVy2RbPGqPcN14=",
         "path": "/home/grwlf/proj/nixcfg/nixpkgs",
         "type": "path"
       },
