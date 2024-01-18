@@ -406,13 +406,15 @@ let
 
           put ${./sh}/rmcommon
           putsh ${./sh}/rmssh-install.sh
+          putsh ${./sh}/rmsyncthing-install.sh
           putsh ${./sh}/rmadd
           putsh ${./sh}/rmfind
           putsh ${./sh}/rmls
           putsh ${./sh}/rmpull
           putsh ${./sh}/rmpush
-          putsh ${./sh}/rmssh
           putsh ${./sh}/rmget
+          putsh ${./sh}/rmssh
+          ln -s $out/bin/rmssh $out/bin/rmscp
 
           putbash ${./sh}/rmadd1
           putbash ${./sh}/rmconvert

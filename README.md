@@ -62,7 +62,7 @@ To enable the specific configuration without installing scripts, link it into
 the `./_rmconfig` file in the current directory and source `./sh/rmcommon`.
 
 ``` sh
-$ ln -s ./sh/nixconfig.sh _rmcommon
+$ ln -s ./sh/nixconfig.sh _rmconfig
 $ . ./sh/rmcommon # Optionally
 ```
 

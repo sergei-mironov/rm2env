@@ -4,13 +4,21 @@
 
 CMD=""
 NCTO='-w 5'
+SNAME=`basename $0`
+SSHTOOL=""
+case "$SNAME" in
+  rmssh) SSHTOOL=ssh ;;
+  rmscp) SSHTOOL=scp ;;
+  *) rmdie "Invalid scrip basename $SNAME" ;;
+esac
+
 while test -n "$1" ; do
   case "$1" in
     -D) RM_DEVICE="$2" ; shift ;;
     -v|--verbose) RM_VERBOSE=y ;;
     --no-timeout) NCTO='' ;;
     -h|--help)
-      echo "rmssh [-D (A|B)] [--no-timeout] [-v|--verbose] SSH_ARGS..." >&2;
+      echo "$SNAME [-D (A|B)] [--no-timeout] [-v|--verbose] SSH_ARGS..." >&2;
       exit 1
       ;;
     *) CMD="$CMD $1" ;;
@@ -24,12 +32,12 @@ fi
 
 if test -n "$RM_VPSSSH" ; then
   VPSRPORT=`rmvpsrport`
-  exec ssh \
+  exec $SSHTOOL \
     -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" \
     -o "StrictHostKeyChecking=no" \
     $CMD
 else
-  exec ssh \
+  exec $SSHTOOL \
     -o "StrictHostKeyChecking=no" \
     $CMD
 fi
