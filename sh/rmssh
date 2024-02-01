@@ -7,8 +7,8 @@ NCTO='-w 5'
 SNAME=`basename $0`
 SSHTOOL=""
 case "$SNAME" in
-  rmssh) SSHTOOL=ssh ;;
-  rmscp) SSHTOOL=scp ;;
+  *rmssh*) SSHTOOL=ssh ;; # Assume also `.rmssh-wrapped`
+  *rmscp*) SSHTOOL=scp ;;
   *) rmdie "Invalid scrip basename $SNAME" ;;
 esac
 
