@@ -55,9 +55,7 @@ for pdf in $(cat $flist) ; do
   N=$(expr $N '+' 1)
 done
 
-if test "$OK" = "$N" ; then
-  rmpush
-else
+if ! test "$OK" = "$N" ; then
   echo "$(expr $N - $OK) errors found. Run rmpush explicitly" | tee -a $LOG
   rmdieL "$LOG"
 fi
