@@ -23,7 +23,14 @@ rmdie() {
 
 rmdieL() {
   if test "$RM_GUI" = "y" ; then
-    (IFS=' '; yad --text-info --filename="$1" --button 'OK!gtk-ok' $RM_GUIARGS ;)
+    (
+      TITLE=''
+      if test -n "$2" ; then
+        TITLE="--title=$2"
+      fi
+      IFS=' '
+      yad --text-info --filename="$LOG" --button='OK!gtk-ok' $RM_GUIARGS "$TITLE"
+    )
   fi
   exit 1
 }

@@ -56,8 +56,8 @@ for pdf in $(cat $flist) ; do
 done
 
 if ! test "$OK" = "$N" ; then
-  echo "$(expr $N - $OK) errors found. Run rmpush explicitly" | tee -a $LOG
-  rmdieL "$LOG"
+  echo "$(expr $N - $OK) errors found while adding files" | tee -a $LOG
+  rmdieL "$LOG" "$(expr $N - $OK) errors found while adding files"
 fi
 
 

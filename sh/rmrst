@@ -1,0 +1,20 @@
+#!/bin/sh
+
+. $(dirname $0)/rmcommon
+
+while test -n "$1" ; do
+  case "$1" in
+    -D) RM_DEVICE=$2 ; shift ;;
+    --gui) RM_GUI=y ;;
+    --no-gui) RM_GUI=n ;;
+    --dry-run) RM_DRYRUN='--dry-run' ;;
+    -v|--verbose) RM_VERBOSE=y ;;
+    -h|--help)
+      echo "rmrst [-D (A|B)] [--[no-]gui] [--dry-run] [-v|--verbose]" >&2;
+      exit 1
+      ;;
+  esac
+  shift
+done
+
+rmdr bash $(dirname $0)/rmssh "$RM_SSH" systemctl restart xochitl

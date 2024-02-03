@@ -6,6 +6,7 @@ CMD=""
 NCTO='-w 5'
 SNAME=`basename $0`
 SSHTOOL=""
+LOG=""
 case "$SNAME" in
   *rmssh*) SSHTOOL=ssh ;; # Assume also `.rmssh-wrapped`
   *rmscp*) SSHTOOL=scp ;;
@@ -17,8 +18,9 @@ while test -n "$1" ; do
     -D) RM_DEVICE="$2" ; shift ;;
     -v|--verbose) RM_VERBOSE=y ;;
     --no-timeout) NCTO='' ;;
+    --log) LOG="$2"; shift ;;
     -h|--help)
-      echo "$SNAME [-D (A|B)] [--no-timeout] [-v|--verbose] SSH_ARGS..." >&2;
+      echo "$SNAME [-D (A|B)] [--no-timeout] [-v|--verbose] [--log FILE] SSH_ARGS..." >&2;
       exit 1
       ;;
     *) CMD="$CMD $1" ;;
@@ -30,14 +32,27 @@ if test "$RM_VERBOSE" = "y" ; then
   set -x
 fi
 
-if test -n "$RM_VPSSSH" ; then
-  VPSRPORT=`rmvpsrport`
-  exec $SSHTOOL \
-    -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" \
-    -o "StrictHostKeyChecking=no" \
-    $CMD
-else
-  exec $SSHTOOL \
-    -o "StrictHostKeyChecking=no" \
-    $CMD
+T=$(mktemp -d --tmpdir)
+trap "rm -rf '$T'" 0 1 2 3 9
+if test -z "$LOG"; then
+  LOG=$T/rmpull_$UID.txt
+fi
+
+{
+  if test -n "$RM_VPSSSH" ; then
+    VPSRPORT=`rmvpsrport`
+    $SSHTOOL \
+      -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" \
+      -o "StrictHostKeyChecking=no" \
+      $CMD
+  else
+    $SSHTOOL \
+      -o "StrictHostKeyChecking=no" \
+      $CMD
+  fi
+  echo "$?" >$T/RET
+} 2>&1 | tee -a "$LOG"
+
+if test x$(cat "$T/RET") != "x0" ; then
+  rmdieL "$LOG" "Failed to restart remarkable gui, code $RET"
 fi
