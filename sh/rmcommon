@@ -104,6 +104,17 @@ echoprogress() {(
   done
 )}
 
+catprogress() {(
+  # Update the progressbar from stdin
+  while read line ; do
+    case "$line" in
+      [0-9]*) test "$RM_PF" != "1" && echo "$line" >&$RM_PF; echo "$line" ;;
+      \#*) test "$RM_PF" != "1" && echo "$line" >&$RM_PF;  echo "$line" ;;
+      *) test "$RM_PF" != "1" && echo "#$line" >&$RM_PF; echo "$line" ;;
+    esac
+  done
+)}
+
 rmvpsrport() {
   case "$RM_DEVICE" in
     A) echo "$RM_VPSRPORT_A" ;;

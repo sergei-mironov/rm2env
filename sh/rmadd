@@ -2,8 +2,11 @@
 
 . $(dirname $0)/rmcommon
 
-flist=$(mktemp --tmpdir)
-trap "rm $flist" 0 1 2 3 9
+T=$(mktemp -d --tmpdir)
+trap "rm -rf '$T'" 0 1 3 9
+FLIST=$T/FLIST
+WAIT=y
+
 while test -n "$1" ; do
   case "$1" in
     --gui) RM_GUI=y;;
@@ -12,10 +15,12 @@ while test -n "$1" ; do
     --dry-run) RM_DRYRUN='--dry-run';;
     --no-thumbnails) RM_THUMBNAILS=n ;;
     -h|--help)
-      echo "rmadd [--[no-]gui] [-v|--verbose] [--dry-run] FILES" >&2
+      echo "rmadd [--[no-]gui] [-v|--verbose] [--dry-run] [--[no-]wait] FILES" >&2
       exit 1
       ;;
-    *) echo "$1" >> $flist;;
+    --wait) WAIT=y ;;
+    --no-wait) WAIT=n ;;
+    *) echo "$1" >> $FLIST;;
   esac
   shift
 done
@@ -26,34 +31,44 @@ fi
 
 set -e
 
-CACHE=/tmp/rmfind_$UID.txt
-LOG=/tmp/rmadd_$UID.txt
-rmls | grep -v /trash/ >$CACHE
+if test -z "$RM_CACHE" ; then
+  RM_CACHE=$T/rmfind_$UID.txt
+fi
+
+LOG=$T/rmadd_$UID.txt
+rmls | grep -v /trash/ >$RM_CACHE
 
 N=0
 OK=0
 IFS=$'\n'
 echo >$LOG
-for pdf in $(cat $flist) ; do
+for pdf in $(cat $FLIST) ; do
   if test -f "$pdf" ; then
     if echo "$pdf" | grep -s -q "#$RM_AMARKER" ; then
       echo "File '$pdf' is already marked as annotaded" | tee -a $LOG
     else
-      UUID=$(rmfind "$CACHE" "$pdf")
-      if test -z "$UUID" ; then
-        if bash $(dirname $0)/rmadd1 "$pdf" >> $LOG ; then
+      rmfind "$RM_CACHE" "$pdf" >$T/FOUND
+      if ! test -s $T/FOUND ; then
+        rmadd1 "$pdf" 2>>$LOG | tail -n 1 >$T/FOUND
+        if test -s $T/FOUND ; then
           OK=$(expr $OK '+' 1)
-          echo "File '$pdf': OK" | tee -a $LOG
+          echo "File '$pdf' was added as $(cat $T/FOUND)" | tee -a $LOG
         fi
       else
-        echo "File '$pdf' already exists on RM2 as $UUID" | tee -a $LOG
+        echo "File '$pdf' already exists on RM2 as $(cat $T/FOUND)" | tee -a $LOG
       fi
+      cat $T/FOUND >>$T/ADDED.txt
     fi
   else
     echo "File '$pdf' does not exist" | tee -a $LOG
   fi
   N=$(expr $N '+' 1)
 done
+
+if test "$WAIT" = "y" ; then
+  rmwait $(cat $T/ADDED.txt)
+  rmrst
+fi
 
 if ! test "$OK" = "$N" ; then
   echo "$(expr $N - $OK) errors found while adding files" | tee -a $LOG

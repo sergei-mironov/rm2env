@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 F="$1"
 
@@ -18,16 +18,16 @@ pdf="$F"
 n=$(pdfinfo "${pdf}" | grep '^Pages' | awk '{print $2}')
 name=$(basename "${pdf}" .pdf)
 date="$(date +%s)000"
-echo Uploading PDF document ${name} with ${n} pages, date ${date}
+echo "Uploading PDF document ${name} with ${n} pages, date ${date}" >&2
 T=$(mktemp --tmpdir --directory "rmadd1.XXXXX")
 mkprogress "$T" "Adding file"
-trap "echo Cleanup; killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
+trap "echo Cleanup >&2; killprogress '$T'; rm -rf '$T'" 0 1 2 3 9
 uuid=$(uuidgen)
-echo Creating $uuid document directories.
+echo "Creating $uuid document directories." >&2
 out="$T/out"
 dest=${out}/${uuid}
-mkdir -pv ${dest}.{cache,highlights,textconversion,thumbnails}
-cp -pv "${pdf}" ${dest}.pdf
+mkdir -pv ${dest}.{cache,highlights,textconversion,thumbnails} >&2
+cp -pv "${pdf}" ${dest}.pdf >&2
 cat > ${dest}.content <<EOF
 {
     "extraMetadata": {
@@ -104,12 +104,14 @@ if test "$RM_THUMBNAILS" = "y" ; then
     page=$(expr $page '+' 1)
   done
 else
-  echo "Skipping making thumbnails due to RM_THUMBNAILS=$RM_THUMBNAILS"
+  echo "Skipping making thumbnails due to RM_THUMBNAILS=$RM_THUMBNAILS" >&2
 fi
 
 if test -n "$RM_DRYRUN" ; then
-  echo "dry-run: COPYING $out to $RM_XOCHITL"
+  echo "dry-run: COPYING $out to $RM_XOCHITL" >&2
 else
-  ( cd "${out}" ; tar cf - . | (cd "$RM_XOCHITL" ; tar xvf - ))
+  ( cd "${out}" ; tar cf - . | (cd "$RM_XOCHITL" ; tar xvf - >&2 ))
 fi
+
+echo ${uuid}
 

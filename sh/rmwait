@@ -1,0 +1,62 @@
+#!/bin/sh
+
+. $(dirname $0)/rmcommon
+
+UUIDS=""
+LOG=""
+
+while test -n "$1" ; do
+  case "$1" in
+    -D) RM_DEVICE=$2 ; shift ;;
+    --gui) RM_GUI=y ;;
+    --no-gui) RM_GUI=n ;;
+    --dry-run) RM_DRYRUN='--dry-run' ;;
+    -v|--verbose) RM_VERBOSE=y ;;
+    -h|--help)
+      echo "rmwait [-D (A|B)] [--[no-]gui] [--dry-run] [-v|--verbose] UUIDS.." >&2;
+      exit 1
+      ;;
+    *) UUIDS="$UUIDS $1" ;;
+  esac
+  shift
+done
+
+if test "$RM_VERBOSE" = "y" ; then
+  set -x
+fi
+
+DEV_XOCHITL=/home/root/.local/share/remarkable/xochitl
+
+if test -z "$UUIDS" ; then
+  rmwarn "rmwait: warning: empty list of uuids" >&2
+  exit 0
+fi
+
+T=$(mktemp -d --tmpdir)
+trap "killprogress '$T'; rm -rf '$T'" 0 1 3 9
+
+if test -z "$LOG"; then
+  LOG=$T/rmwait_$UID.log
+fi
+
+mkprogress "$T" "Syncing"
+
+{
+rmdr rmssh $RM_SSH -- \
+ "for UUID in $UUIDS ; do "\
+ "  echo \"Checking $DEV_XOCHITL/\$UUID.pdf\" ; "\
+ "  while ! test -f \"$DEV_XOCHITL/\$UUID.pdf\" ; do "\
+ "    sleep 1; echo -n . ;"\
+ "  done; "\
+ "done"
+echo "$?" >$T/RET
+} 2>>$LOG | tee -a "$LOG" | catprogress
+
+killprogress "$T"
+
+RET=$(cat "$T/RET")
+if test x$(cat "$T/RET") != "x0" ; then
+  ( rmdieL "$LOG" "Failed wait for UUIDs, code $RET" ; )
+fi
+
+exit $RET

@@ -415,6 +415,7 @@ let
           putsh ${./sh}/rmget
           putsh ${./sh}/rmssh
           putsh ${./sh}/rmrst
+          putsh ${./sh}/rmwait
           ln -s $out/bin/rmssh $out/bin/rmscp
 
           putbash ${./sh}/rmadd1

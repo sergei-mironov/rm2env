@@ -63,7 +63,12 @@ mkprogress "$T" "Listing files"
 xochitl="$RM_XOCHITL"
 N=$(find ${xochitl} -name '*.metadata' | wc -l)
 i=0
-for metadata in $(find ${xochitl} -name '*.metadata')
+if test -n "$1"; then
+  QUERY="$1" # should return metadata files
+else
+  QUERY='*.metadata'
+fi
+for metadata in $(find ${xochitl} -name "$QUERY")
 do
     uuid=$(basename "${metadata}" .metadata)
     # check to see if this is a file or a directory (Collection)
@@ -78,6 +83,9 @@ do
     fi
     percent=$(awk "BEGIN{print ($i/${N})*100}")
     echoprogress "$T" -S "$percent"
+    if test "$?" != "0" ; then
+      break
+    fi
     i=$(expr $i '+' 1)
 done
 # main block:1 ends here
