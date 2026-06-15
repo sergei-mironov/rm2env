@@ -352,7 +352,7 @@ let
             ${./3rdparty/fraga/getpageuuids.awk}
           wrapProgram $out/bin/rmconvert.sh \
             --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                python3 inkscape xpdf pdftk ghostscript poppler_utils])}
+                python3 inkscape xpdf pdftk ghostscript poppler-utils])}
         '';
       };
 
@@ -383,7 +383,7 @@ let
             put "$1"
             wrapProgram "$out/bin/$(basename $1 .sh)" \
               --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                yad python3 inkscape xpdf pdftk ghostscript poppler_utils])} \
+                yad python3 inkscape xpdf pdftk ghostscript poppler-utils])} \
               --prefix PATH : $out/bin
           }
           putbash() {
@@ -392,7 +392,7 @@ let
               --replace /bin/bash ${pkgs.bash}/bin/bash
             wrapProgram "$out/bin/$(basename $1 .sh)" \
               --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                yad python3 inkscape xpdf pdftk ghostscript poppler_utils])} \
+                yad python3 inkscape xpdf pdftk ghostscript poppler-utils])} \
               --prefix PATH : $out/bin
           }
           cat >$out/bin/rmconfig <<EOF
@@ -440,7 +440,7 @@ let
           pkgs.xpdf
           pkgs.pdftk
           pkgs.ghostscript
-          pkgs.poppler_utils
+          pkgs.poppler-utils
           pkgs.gnome.zenity
           pkgs.yad
         ];
