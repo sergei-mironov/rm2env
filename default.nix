@@ -384,7 +384,7 @@ let
         '';
       };
 
-      restream = pkgs.stdenv.mkDerivation {
+      reStream = pkgs.stdenv.mkDerivation {
         name = "rmsynctools";
         buildInputs = [ pkgs.makeWrapper ];
         buildCommand = ''
