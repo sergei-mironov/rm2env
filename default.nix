@@ -384,6 +384,26 @@ let
         '';
       };
 
+      restream = pkgs.stdenv.mkDerivation {
+        name = "rmsynctools";
+        buildInputs = [ pkgs.makeWrapper ];
+        buildCommand = ''
+          . $stdenv/setup
+          mkdir -pv $out/bin
+          put() {
+            cp -v "$1" "$out/bin/$(basename $1 .sh)"
+            chmod +x "$out/bin/$(basename $1 .sh)"
+          }
+          putsh() {
+            put "$1"
+            wrapProgram "$out/bin/$(basename $1 .sh)" \
+              --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
+                lz4 ffmpeg openssh gnused])}
+          }
+          putsh ${./sh}/reStream.sh
+        '';
+      };
+
       rmsynctools = config : pkgs.stdenv.mkDerivation (
         let
           C = { extraConfig = ""; } // config;
