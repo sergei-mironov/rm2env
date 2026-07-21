@@ -17,6 +17,9 @@ let
 
         propagatedBuildInputs = [ pkgs.xorg.xrandr ];
 
+        pyproject = true;
+        build-system = [ python.setuptools ];
+
         src = python.fetchPypi {
           inherit pname version;
           sha256 = "sha256:0vq2igzfi3din1fah18fzp7wdh089hf28s3lwm321k11jhycqgy9";
@@ -31,6 +34,9 @@ let
         # nativeBuildInputs = [ pkgs.libevdev ];
         LD_LIBRARY_PATH="${pkgs.libevdev}/lib";
 
+        pyproject = true;
+        build-system = [ python.setuptools ];
+
         src = python.fetchPypi {
           inherit pname version;
           sha256 = "sha256:17agnigmzscmdjqmrylg1lza03hwjhgxbpf4l705s6i7p7ndaqrs";
@@ -40,6 +46,9 @@ let
       setuptools-lint = python.buildPythonPackage rec {
         pname = "setuptools-lint";
         version = "0.6.0";
+
+        pyproject = true;
+        build-system = [ python.setuptools ];
 
         src = python.fetchPypi {
           inherit pname version;
@@ -61,6 +70,9 @@ let
 
         buildInputs = [ pkgs.linuxHeaders ];
 
+        pyproject = true;
+        build-system = [ python.setuptools ];
+
         patchPhase = ''
           substituteInPlace setup.py --replace /usr/include/linux ${pkgs.linuxHeaders}/include/linux
         '';
@@ -74,6 +86,9 @@ let
         doCheck = false; # Minotaur doesn't have tests
 
         propagatedBuildInputs = with python ; [ evdev xlib sphinx setuptools-lint ];
+
+        pyproject = true;
+        build-system = [ python.setuptools ];
 
         src = python.fetchPypi {
           inherit pname version;
@@ -90,6 +105,9 @@ let
         sphinx paramiko tkinter ];
 
         nativeBuildInputs = [ pkgs.libevdev ];
+
+        pyproject = true;
+        build-system = [ python.setuptools ];
 
         # src = ./3rdparty/remarkable_mouse;
         src = pkgs.fetchFromGitHub {
@@ -441,8 +459,9 @@ let
           pkgs.pdftk
           pkgs.ghostscript
           pkgs.poppler-utils
-          pkgs.gnome.zenity
+          pkgs.zenity
           pkgs.yad
+          pkgs.lz4
         ];
       shellHook = with pkgs; ''
         export PATH=`pwd`/sh:`pwd`/3rdparty/remarkable-cli-tooling:`pwd`/3rdparty/rMsync:$PATH
