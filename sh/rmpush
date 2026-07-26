@@ -41,7 +41,7 @@ fi
 {
 mkprogress "$T" "Checking the connection" "--pulsate"
 echoprogress "$T" -S 0 "Checking the connection"
-while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" /bin/true ; do
+while ! rmssh -o "ConnectTimeout=3" "$RM_SSH" --no-gui /bin/true ; do
   echoprogress "$T" -S 100 "Checking the connection"
   sleep 0.1
 done
