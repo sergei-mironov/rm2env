@@ -117,6 +117,7 @@ The workflow:
        web-server.  Unfortunately, `rmconvert` is pretty slow and has some
        issues with SVG graphics in PDF documents.
    - [rmadd](./sh/rmadd) adds new document to the file tree
+     + Uses Dr.Fraga's script under the name [rmadd1](./sh/rmadd)
 5. Run [rmpush](./sh/rmpush) to push the modified `xochitl` tree back to the
    RM2 device. `rmpush` doesn't remove anything from the tablet.
 
