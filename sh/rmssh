@@ -37,9 +37,14 @@ fi
 
 T=$(mktemp -d --tmpdir)
 trap "rm -rf '$T'" 0 1 3 9
-if test -z "$LOG"; then
-  LOG=$T/rmpull_$UID.txt
-fi
+
+log() {
+  if test -n "$LOG"; then
+    tee -a $LOG
+  else
+    cat
+  fi
+}
 
 (
   trap "exit 1" 2
@@ -55,11 +60,11 @@ fi
       $CMD "$@"
   fi
   echo "$?" >$T/RET
-) 2>&1 | tee -a "$LOG"
+) 2>&1 | log
 
 RET=$(cat "$T/RET")
 if test x$(cat "$T/RET") != "x0" ; then
-  ( rmdieL "$LOG" "Failed to restart remarkable gui, code $RET" ; )
+  ( rmdieL "$LOG" "Failed to establish ssh connection, code $RET" ; )
 fi
 
 exit $RET

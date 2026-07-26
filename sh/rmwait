@@ -41,6 +41,7 @@ fi
 
 mkprogress "$T" "Syncing"
 
+# FIXME: closing GUI does not lead to the below pipe termination
 {
 rmdr rmssh $RM_SSH -- \
  "for UUID in $UUIDS ; do "\
