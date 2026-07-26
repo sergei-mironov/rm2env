@@ -123,7 +123,15 @@ The workflow:
 All transport scripts support accessing up to two RM2 devices using the reverse
 SSH tunnel. See `-D (A|B)` command line argument.
 
+### reStream.sh
+
+1. Deal with the `restream.arm.static`. Copy it to the device? (TODO: check the
+   manual)
+2. Use [reStream.sh](sh/reStream.sh)
+
 ### Remouse
+
+**OUTDATED**
 
 To link the RM2 stylus with the Host mouse, do
 
@@ -185,9 +193,9 @@ Resources
 
 ### General
 
+* List of remarkable projects https://github.com/reHackable/awesome-reMarkable
 * RemarkableWiki https://remarkablewiki.com/tips/start
   - SSH key issues https://remarkablewiki.com/tech/ssh on modern hardware
-* reHackable https://github.com/reHackable/awesome-reMarkable
 * Reddit
   - https://www.reddit.com/r/RemarkableTablet/comments/ickcu5/we_need_split_screen_for_the_rm2/
 * reMarkable directory structure
