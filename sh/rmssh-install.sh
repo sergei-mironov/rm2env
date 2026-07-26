@@ -62,6 +62,18 @@ ssh $RM_VPSSSH "cat .ssh/authorized_keys | grep -v root@remarkable$RM_DEVICE > .
 ssh $RM_VPSSSH "cat .ssh/id_rsa-remarkable_${RM_DEVICE}.pub >> .ssh/authorized_keys.new"
 ssh $RM_VPSSSH 'mv --backup=numbered .ssh/authorized_keys.new .ssh/authorized_keys'
 
+
+cat >_sshR <<EOF
+#!/bin/sh
+IP="\$(/usr/sbin/ip -4 addr show dev wlan0 2>/dev/null | awk '/inet / {print \$2}' | cut -d/ -f1)"
+if test -z "\$IP" ; then
+    echo "Error: no IP address found on wlan0" >&2
+    exit 1
+fi
+/usr/bin/rm-ssh-over-wlan on
+exec /usr/bin/ssh -y -y -K 3 -o "ExitOnForwardFailure=yes" -p$RM_VPSPORT -R$VPSRPORT:\$IP:22 $RM_VPSUSER@$RM_VPSIP -N
+EOF
+
 cat >_sshR.service <<EOF
 [Unit]
 Description=Keep SSH reverse-proxy connection to a personal VPS (device $RM_DEVICE)
@@ -71,7 +83,7 @@ Wants=network.target
 
 [Service]
 Environment="HOME=/home/root"
-ExecStart=/usr/bin/ssh -y -y -K 3 -o "ExitOnForwardFailure=yes" -p$RM_VPSPORT -R$VPSRPORT:10.11.99.1:22  $RM_VPSUSER@$RM_VPSIP -N
+ExecStart=/usr/bin/sshR
 Restart=on-failure
 RestartSec=5
 User=root
@@ -80,8 +92,9 @@ User=root
 WantedBy=multi-user.target
 EOF
 
+scp ./_sshR $RM_SSH:/usr/bin/sshR
 scp ./_sshR.service $RM_SSH:/etc/systemd/system/sshR.service
-ssh $RM_SSH 'systemctl daemon-reload && systemctl start sshR.service'
+ssh $RM_SSH 'chmod +x /usr/bin/sshR && systemctl daemon-reload && systemctl restart sshR.service'
 
 # scp ./remarkabot root@"$1":/opt/remarkabot/remarkabot
 # scp ./scripts/run root@"$1":/opt/remarkabot/run
