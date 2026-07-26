@@ -122,7 +122,7 @@ done
 
 ssh_cmd() {
     echo "[SSH]" "$@" >&2
-    ssh -o ConnectTimeout=1 \
+    ssh -o ConnectTimeout=10 \
         -o PasswordAuthentication=no \
         -o PubkeyAcceptedKeyTypes=+ssh-rsa \
         -o HostKeyAlgorithms=+ssh-rsa \
