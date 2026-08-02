@@ -17,6 +17,7 @@ while test -n "$1" ; do
   case "$1" in
     --gui) RM_GUI=y;;
     --no-gui) RM_GUI=n;;
+    --no-vps) RM_VPSSSH='' ;;
     -D) RM_DEVICE="$2" ; shift ;;
     -v|--verbose) RM_VERBOSE=y ;;
     --no-timeout) NCTO='' ;;
@@ -52,10 +53,12 @@ log() {
     VPSRPORT=`rmvpsrport`
     $SSHTOOL \
       -o "ProxyCommand ssh $RM_VPSSSH nc $NCTO 127.0.0.1 $VPSRPORT" \
+      -o "User root" \
       -o "StrictHostKeyChecking=no" \
       $CMD "$@"
   else
     $SSHTOOL \
+      -o "User root" \
       -o "StrictHostKeyChecking=no" \
       $CMD "$@"
   fi
@@ -63,7 +66,7 @@ log() {
 ) 2>&1 | log
 
 RET=$(cat "$T/RET")
-if test x$(cat "$T/RET") != "x0" ; then
+if test -n "$LOG" -a x$(cat "$T/RET") != "x0" ; then
   ( rmdieL "$LOG" "Failed to establish ssh connection, code $RET" ; )
 fi
 

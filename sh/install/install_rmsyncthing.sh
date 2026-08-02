@@ -1,7 +1,6 @@
 #!/bin/sh
 
-
-. $(dirname $0)/rmcommon
+. rmcommon
 
 while test -n "$1" ; do
   case "$1" in
@@ -18,7 +17,8 @@ set -e -x
 
 
 rmssh $RM_SSH '
-  wget -O - http://raw.githubusercontent.com/Evidlo/remarkable_entware/master/install.sh | sh
+  wget -O - http://raw.githubusercontent.com/Evidlo/remarkable_entware/master/install.sh | sh;
+  export PATH=/opt/bin:/opt/sbin:$PATH;
   opkg install syncthing
 '
 

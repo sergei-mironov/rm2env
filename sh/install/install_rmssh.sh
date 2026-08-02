@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. $(dirname $0)/rmcommon
+. rmcommon
 
 while test -n "$1" ; do
   case "$1" in
