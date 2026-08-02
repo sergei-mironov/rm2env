@@ -50,14 +50,14 @@ ssh $RM_SSH mkdir .ssh || true
 ssh $RM_SSH rm .ssh/id_dropbear || true
 ssh $RM_SSH /usr/sbin/dropbearkey -t rsa -f .ssh/id_dropbear \
   | grep ssh-rsa \
-  | sed "s/root@reMarkable/root@remarkable$RM_DEVICE/g" > _id_rsa-remarkable.pub
+  | sed "s/root@reMarkable/root@remarkable$RM_DEVICE/g" > _tmp_id_rsa-remarkable.pub
 
-if ! test -s _id_rsa-remarkable.pub ; then
+if ! test -s _tmp_id_rsa-remarkable.pub ; then
   rmdie "Failed to generate SSH key for $RM_DEVICE"
 fi
 
 ssh $RM_VPSSSH mkdir .ssh || true
-scp ./_id_rsa-remarkable.pub $RM_VPSSSH:.ssh/id_rsa-remarkable_${RM_DEVICE}.pub
+scp ./_tmp_id_rsa-remarkable.pub $RM_VPSSSH:.ssh/id_rsa-remarkable_${RM_DEVICE}.pub
 ssh $RM_VPSSSH "cat .ssh/authorized_keys | grep -v root@remarkable$RM_DEVICE > .ssh/authorized_keys.new"
 ssh $RM_VPSSSH "cat .ssh/id_rsa-remarkable_${RM_DEVICE}.pub >> .ssh/authorized_keys.new"
 ssh $RM_VPSSSH 'mv --backup=numbered .ssh/authorized_keys.new .ssh/authorized_keys'
@@ -94,7 +94,12 @@ EOF
 
 scp ./_sshR $RM_SSH:/usr/bin/sshR
 scp ./_sshR.service $RM_SSH:/etc/systemd/system/sshR.service
-ssh $RM_SSH 'chmod +x /usr/bin/sshR && systemctl daemon-reload && systemctl restart sshR.service'
+ssh $RM_SSH '
+  chmod +x /usr/bin/sshR &&
+  systemctl daemon-reload &&
+  systemctl enable sshR
+  systemctl restart sshR
+'
 
 # scp ./remarkabot root@"$1":/opt/remarkabot/remarkabot
 # scp ./scripts/run root@"$1":/opt/remarkabot/run

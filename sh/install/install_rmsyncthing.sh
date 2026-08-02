@@ -17,6 +17,11 @@ done
 set -e -x
 
 
+rmssh $RM_SSH '
+  wget -O - http://raw.githubusercontent.com/Evidlo/remarkable_entware/master/install.sh | sh
+  opkg install syncthing
+'
+
 cat >_syncthing.service <<EOF
 [Unit]
 Description=syncthing
@@ -31,4 +36,10 @@ WantedBy=multi-user.target
 EOF
 
 rmscp ./_syncthing.service $RM_SSH:/etc/systemd/system/syncthing.service
-rmssh $RM_SSH 'systemctl daemon-reload && systemctl start syncthing.service && systemctl enable syncthing'
+rmssh $RM_SSH '
+  systemctl daemon-reload &&
+  systemctl enable syncthing &&
+  systemctl restart syncthing
+'
+
+echo "Configuration page: https://10.11.99.1:8888"
