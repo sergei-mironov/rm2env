@@ -400,13 +400,15 @@ let
               --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
                 lz4 ffmpeg openssh gnused])}
           }
-          putsh ${./sh}/reStream.sh
+          putsh ${./sh/reStream}/reStream.sh
         '';
       };
 
       rmsynctools = config : pkgs.stdenv.mkDerivation (
         let
           C = { extraConfig = ""; } // config;
+          deps = pkgs.lib.makeBinPath (with pkgs; [
+            yad python3 inkscape xpdf pdftk ghostscript poppler-utils]);
         in {
         name = "rmsynctools";
         buildInputs = [ pkgs.makeWrapper ];
@@ -420,8 +422,7 @@ let
           putsh() {
             put "$1"
             wrapProgram "$out/bin/$(basename $1 .sh)" \
-              --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                yad python3 inkscape xpdf pdftk ghostscript poppler-utils])} \
+              --prefix PATH : ${deps} \
               --prefix PATH : $out/bin
           }
           putbash() {
@@ -429,8 +430,7 @@ let
             substituteInPlace "$out/bin/$(basename $1 .sh)" \
               --replace /bin/bash ${pkgs.bash}/bin/bash
             wrapProgram "$out/bin/$(basename $1 .sh)" \
-              --prefix PATH : ${pkgs.lib.makeBinPath (with pkgs; [
-                yad python3 inkscape xpdf pdftk ghostscript poppler-utils])} \
+              --prefix PATH : ${deps} \
               --prefix PATH : $out/bin
           }
           cat >$out/bin/rmconfig <<EOF
