@@ -443,8 +443,6 @@ let
           EOF
 
           put ${./sh}/rmcommon
-          putsh ${./sh}/rmssh-install.sh
-          putsh ${./sh}/rmsyncthing-install.sh
           putsh ${./sh}/rmadd
           putsh ${./sh}/rmfind
           putsh ${./sh}/rmls
